@@ -31,3 +31,13 @@ C:\Users\j_kui\source\repos\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcore
 C:\Users\j_kui\source\repos\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.AssemblyInfo.cs
 C:\Users\j_kui\source\repos\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.dll
 C:\Users\j_kui\source\repos\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.pdb
+F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\bin\Debug\netcoreapp2.0\AmazonSimulator VS.deps.json
+F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\bin\Debug\netcoreapp2.0\AmazonSimulator VS.runtimeconfig.json
+F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\bin\Debug\netcoreapp2.0\AmazonSimulator VS.runtimeconfig.dev.json
+F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\bin\Debug\netcoreapp2.0\AmazonSimulator VS.dll
+F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\bin\Debug\netcoreapp2.0\AmazonSimulator VS.pdb
+F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.csproj.CoreCompileInputs.cache
+F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.AssemblyInfoInputs.cache
+F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.AssemblyInfo.cs
+F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.dll
+F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.pdb
