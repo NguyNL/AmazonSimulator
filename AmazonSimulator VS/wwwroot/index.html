@@ -216,15 +216,13 @@
             }
 
             function createRobot(onload) {
-                if (robotsObj) {
-                    var copyRobot = robotsObj.copy();
-                    console.log(copyRobot);
-                } else {
+                if (robotsObj) 
+                    onload(robotsObj.clone());
+                else 
                     loadOBJModel('obj/robot/', 'robot.obj', 'obj/robot/', 'robot.mtl', (mesh) => {
                         robotsObj = mesh;
                         onload(robotsObj);
                     });
-                }
             }
 
 
@@ -815,7 +813,7 @@
                                     createRobot((meshObj) => {
                                         var robot = new THREE.Group();
                                         robot.add(meshObj);
-                                        robot.position.x = i;
+                                        robot.position.z = i*20;
                                         robotsGroup.add(robot);
                                     });
                             });
