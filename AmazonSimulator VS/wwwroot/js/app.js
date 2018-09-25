@@ -746,8 +746,11 @@ window.onload = function () {
                         robot = new Robot(robotsGroup.children[0]);
                     else
                         robot = new Robot();
-                        
 
+
+                    robot.position.x = command.parameters.x;
+                    robot.position.y = command.parameters.y;
+                    robot.position.z = command.parameters.z;
                     robotsGroup.add(robot);
                 }
             }
