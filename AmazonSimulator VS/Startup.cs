@@ -50,6 +50,7 @@ namespace AmazonSimulator_VS
             provider.Mappings[".obj"] = "text/plain";
             provider.Mappings[".dds"] = "application/dds";
             provider.Mappings[".tga"] = "application/tga";
+            provider.Mappings[".glb"] = "application/glb";
 
             app.UseStaticFiles(new StaticFileOptions
             {
