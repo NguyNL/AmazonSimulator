@@ -40,4 +40,4 @@ F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\
 F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.AssemblyInfo.cs
 F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.dll
 F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.pdb
-C:\Users\j_kui\source\repos\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.csprojResolveAssemblyReference.cache
+C:\Users\j_kui\source\repos\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.csprojAssemblyReference.cache

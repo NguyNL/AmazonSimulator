@@ -13,8 +13,8 @@ namespace Models {
         
         
         public World() {
-            Robot r = CreateRobot(0,0,0);
-            Robot r1 = CreateRobot(0, 0, 20);
+            //Robot r = CreateRobot(0,0,0);
+            //Robot r1 = CreateRobot(0, 0, 20);
             //r.Move(4.6, 0, 13);
 
             Path();
@@ -26,10 +26,8 @@ namespace Models {
             int x = 0;
             int z = 0;
 
-            int step = 20;
-
-            int currentX = 0;
-            int currentZ = 0;
+            int stepX = 17;
+            int stepZ = 20;
 
             //for (int row = 0; row < 8; row++)
             //{
@@ -40,45 +38,49 @@ namespace Models {
             //                row.ToString() + column.ToString(),
             //                new Dictionary<string, Node>() {
             //                    { "B",  new Node {
-            //                            x = column * step,
+            //                            x = column * stepX,
             //                            y = 0,
-            //                            z = row * step
+            //                            z = row * stepZ
             //                        }
             //                    }
             //                });
             //    }
             //}
-            
+
+            Robot rr = CreateRobot(0);
+
             g.add_vertex("03", new Dictionary<string, Node>() {
-                { "23", new Node{ x = 40, z = 60 } },
-                { "43",  new Node{ x = 80, z = 60 } },
-                { "63",  new Node{ x = 120, z = 60 } }
+                { "73", new Node{ x = 68, z = 160 } },
+                { "93",  new Node{ x = 68, z = 200 } },
+                { "113",  new Node{ x = 68, z = 240 } }
             });
 
             g.add_vertex("04", new Dictionary<string, Node>() {
-                { "03", new Node{ x = 0, z = 60 } }
+                { "03", new Node{ x = 68, z = 0 } }
             });
 
-            g.add_vertex("20", new Dictionary<string, Node>() {
-                { "30", new Node{ x = 60, z = 0 } }
+            g.add_vertex("70", new Dictionary<string, Node>() {
+                { "120", new Node{ x = 0, z = 240 } }
             });
 
-            g.add_vertex("30", new Dictionary<string, Node>() {});
+            g.add_vertex("120", new Dictionary<string, Node>() {});
 
-            g.add_vertex("23", new Dictionary<string, Node>() {
-                { "20", new Node{ x = 40, z = 0 } }
+            g.add_vertex("73", new Dictionary<string, Node>() {
+                { "70", new Node{ x = 0, z = 160 } }
             });
 
-            g.add_vertex("43", new Dictionary<string, Node>() {});
-            g.add_vertex("63", new Dictionary<string, Node>() { });
+            g.add_vertex("93", new Dictionary<string, Node>() {});
+            g.add_vertex("113", new Dictionary<string, Node>() { });
 
             //g.shortest_path("04", "03").ForEach(
             //        xy => Console.WriteLine(xy)
             //    );
-            Robot rr = CreateRobot(0, 0, 0);
-            g.shortest_path("04", "30").ForEach(
-                   xy => rr.Move(xy)
-               );
+
+            rr.Move(g.shortest_path("04", "120"));
+
+            //g.shortest_path("04", "120").ForEach(
+            //       zx => rr.Move(zx)
+            //   );
 
             //g.add_vertex("B", new Dictionary<string, Node>() { { "A", 7 }, { "F", 2 } });
             //g.add_vertex("C", new Dictionary<string, Node>() { { "A", 8 }, { "F", 6 }, { "G", 4 } });
@@ -94,8 +96,15 @@ namespace Models {
             //    );
         }
 
-        private Robot CreateRobot(double x, double y, double z) {
-            Robot r = new Robot(x,y,z,0,0,0);
+        private Robot CreateRobot(double x, double y, double z, int ID) {
+            Robot r = new Robot(x,y,z,0,0,0, ID);
+            worldObjects.Add(r);
+            return r;
+        }
+
+        private Robot CreateRobot(int ID)
+        {
+            Robot r = new Robot(ID);
             worldObjects.Add(r);
             return r;
         }

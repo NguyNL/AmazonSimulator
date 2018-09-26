@@ -8,19 +8,23 @@ namespace Models
     public class Graph
     {
         Dictionary<string, Dictionary<string, Node>> vertices = new Dictionary<string, Dictionary<string, Node>>();
+        Dictionary<string, Node> nodesSmall = new Dictionary<string, Node>();
+
 
         public void add_vertex(string name, Dictionary<string, Node> edges)
         {
             vertices[name] = edges;
+            
+            edges.ToList().ForEach(x => nodesSmall.Add(x.Key, x.Value));
         }
 
-        public List<String> shortest_path(string start, string finish)
+        public Node[] shortest_path(string start, string finish)
         {
             var previous = new Dictionary<string, string>();
             var distances = new Dictionary<string, double>();
             var nodes = new List<String>();
 
-            List<String> path = null;
+            List<Node> path = null;
 
             foreach (var vertex in vertices)
             {
@@ -45,10 +49,10 @@ namespace Models
 
                 if (smallest == finish)
                 {
-                    path = new List<String>();
+                    path = new List<Node>();
                     while (previous.ContainsKey(smallest))
                     {
-                        path.Add(smallest);
+                        path.Add(nodesSmall[smallest]);
                         smallest = previous[smallest];
                     }
 
@@ -72,7 +76,7 @@ namespace Models
             }
 
             path.Reverse();
-            return path;
+            return path.ToArray();
         }
     }
 }

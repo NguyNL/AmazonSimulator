@@ -84,11 +84,18 @@ window.onload = function () {
     warehouse.position.y = -4.39;
     warehouse.position.z = -30;
 
+    // warehouseGrid
+    var warehouseGrid = new THREE.Group();
+    warehouseGrid.rotation.y = 90 * Math.PI / 180;
+    warehouseGrid.position.x = 3.8;
+    warehouseGrid.position.z = 29.2;
+    warehouse.add(warehouseGrid);
+
     // Robot
     var robotsGroup = new THREE.Group();
     robotsGroup.position.y = 0.2;
     robotsGroup.scale.set(0.06, 0.06, 0.06);
-    warehouse.add(robotsGroup);
+    warehouseGrid.add(robotsGroup);
 
     function makeFilledRack(onload) {
         var rack = new THREE.Group();
@@ -183,7 +190,6 @@ window.onload = function () {
 
         THREE.Loader.Handlers.add(/\.tga$/i, new THREE.TGALoader());
 
-       
         /**
          ** SKYBOX
          **/
@@ -238,6 +244,13 @@ window.onload = function () {
 
         THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
 
+        //robot = new Robot();
+        //robot.position.x = 51; // 17
+        //robot.position.y = 0;
+        //robot.position.z = 120; // 0
+
+        ////robot.rotation.y = 90 * Math.PI / 180;
+        //robotsGroup.add(robot);
 
         /**
          ** RACK FILLING
@@ -249,17 +262,18 @@ window.onload = function () {
 
         //rackPerRow = 9;
         //rowBreak = 0;
-        //for (var i = 0; i < 36; i++)
+        //for (var i = 0; i < 18; i++)
         //    makeFilledRack((rack) => {
-        //        rack.position.x = (Math.floor(i % rackPerRow) * 1) + (rowBreak * 1);
+        //        rack.position.x = ((Math.floor(i % rackPerRow) * 1) + (rowBreak * 1));
         //        rack.position.y = 0.96;
-        //        rack.position.z = Math.floor(i / rackPerRow) * 2.5;
+        //        rack.position.z = (Math.floor(i / rackPerRow) * 2.5)+6;
+                
 
         //        if (i % 3 == 2) rowBreak++;
         //        if (i % 3 == 2 && rowBreak == 3) rowBreak = 0;
 
         //        racks.push(rack);
-        //        warehouse.add(rack);
+        //        warehouseGrid.add(rack);
 
         //        rack.name = 'rack' + i;
         //        rack.cursor = "pointer";
@@ -734,6 +748,7 @@ window.onload = function () {
         renderer.render(scene, camera);
     }
 
+    robots = {};
     exampleSocket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/connect_client");
     exampleSocket.onmessage = function (event) {
         var command = parseCommand(event.data);
@@ -741,16 +756,27 @@ window.onload = function () {
         if (command.command === "update") {
             if (Object.keys(worldObjects).indexOf(command.parameters.guid) < 0) {
                 if (command.parameters.type === "robot") {
+
                     var robot;
-                    if (robotsGroup.children.length > 0)
-                        robot = new Robot(robotsGroup.children[0]);
-                    else
-                        robot = new Robot();
 
+                    if (!(command.parameters.ID in robots)) {
+                        
+                        if (robotsGroup.children.length > 0)
+                            robot = new Robot(robotsGroup.children[0]);
+                        else
+                            robot = new Robot();
 
+                        robots[command.parameters.ID] = robot;
+                    } else {
+                        robot = robots[command.parameters.ID];
+                    }
+                   
+                    
                     robot.position.x = command.parameters.x;
                     robot.position.y = command.parameters.y;
                     robot.position.z = command.parameters.z;
+
+                    
                     robotsGroup.add(robot);
                 }
             }
