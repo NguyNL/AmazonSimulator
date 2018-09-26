@@ -4,21 +4,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AmazonSimulator
+namespace Models
 {
     public class Mesh : IUpdatable {
-        protected double _x = 0;
-        protected double _y = 0;
-        protected double _z = 0;
-        protected double _rX = 0;
-        protected double _rY = 0;
-        protected double _rZ = 0;
+        private double _x = 0;
+        private double _y = 0;
+        private double _z = 0;
+        private double _rX = 0;
+        private double _rY = 0;
+        private double _rZ = 0;
 
         public string type { get; protected set; }
         public Guid guid { get; protected set; }
-        public double x { get { return _x; } }
-        public double y { get { return _y; } }
-        public double z { get { return _z; } }
+        public double x { get { return _x; } protected set { _x = value; } }
+        public double y { get { return _y; } protected set { _y = value; } }
+        public double z { get { return _z; } protected set { _z = value; } }
         public double rotationX { get { return _rX; } }
         public double rotationY { get { return _rY; } }
         public double rotationZ { get { return _rZ; } }

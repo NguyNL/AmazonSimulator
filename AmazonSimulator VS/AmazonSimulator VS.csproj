@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Models\Node.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.9" />
   </ItemGroup>
 
