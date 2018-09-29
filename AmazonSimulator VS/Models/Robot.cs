@@ -6,15 +6,18 @@ using Newtonsoft.Json;
 namespace Models {
     public class Robot : Mesh, IUpdatable {
         private List<RobotTask> Tasks = new List<RobotTask>();
-        private double Speed = 1; 
+        private double Speed = 1;
+        public string Position { get; private set; }
 
         public Robot(double x, double y, double z, double rotationX, double rotationY, double rotationZ, int ID) : base(x,y,z,rotationX,rotationY,rotationZ, ID) {
             this.type = "robot";
+            this.Position = "07";
         }
         
         public Robot(int ID) : base(ID)
         {
             this.type = "robot";
+            this.Position = "07";
 
             this.x =  119;
             this.y =    0;
@@ -44,9 +47,10 @@ namespace Models {
                 Tasks.First().RemovePath();
         }
 
-        public void Move(Node[] path)
+        public void Move(Node[] path, string position)
         {
             Tasks.Add(new RobotTask(path));
+            this.Position = position;
         }
 
 

@@ -11,6 +11,7 @@ namespace Models {
         private List<IObserver<Command>> observers = new List<IObserver<Command>>();
         private Dictionary<string, Node> Map = new Dictionary<string, Node>();
         private Dictionary<int, string> RackPositions = new Dictionary<int, string>();
+        private Dictionary<int, string> RobotPositions = new Dictionary<int, string>();
         //private List<Node> nodeList = new List<Node>();
 
 
@@ -197,7 +198,9 @@ namespace Models {
             }
 
             Robot rr = CreateRobot(0);
-            rr.Move(g.shortest_path("07", "121"));
+
+            rr.Move(g.shortest_path(rr.Position, "121"), "121");
+            rr.Move(g.shortest_path(rr.Position, "101"), "101");
         }
 
         private Robot CreateRobot(double x, double y, double z, int ID) {
