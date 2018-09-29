@@ -25,24 +25,22 @@ namespace Models {
             this.rotationZ = 0;
         }
 
+
         public void MoveOverPath(Node[] path)
         {
-            double firstX = path.First().x;
-            double firstZ = path.First().z;
-            
-            if (firstX == this.x)
-                if (firstZ > this.z)
-                    this.z += Speed;
-                else
-                    this.z -= Speed;
+            this.z = path.First().x == this.x ?
+                path.First().z > this.z ? 
+                this.z += Speed : 
+                this.z -= Speed : 
+                this.z;
 
-            if (firstZ == this.z)
-                if(firstX > this.x)
-                    this.x += Speed;
-                else
-                    this.x -= Speed;
+            this.x = path.First().z == this.z ?
+                path.First().x > this.x ?
+                this.x += Speed :
+                this.x -= Speed :
+                this.x;
 
-            if (firstX == this.x && firstZ == this.z)
+            if (path.First().x == this.x && path.First().z == this.z)
                 Tasks.First().RemovePath();
         }
 

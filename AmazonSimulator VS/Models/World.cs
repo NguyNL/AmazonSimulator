@@ -9,9 +9,11 @@ namespace Models {
     {
         private List<Robot> worldObjects = new List<Robot>();
         private List<IObserver<Command>> observers = new List<IObserver<Command>>();
+        private Dictionary<string, Node> Map = new Dictionary<string, Node>();
+        private Dictionary<int, string> RackPositions = new Dictionary<int, string>();
         //private List<Node> nodeList = new List<Node>();
-        
-        
+
+
         public World() {
             //Robot r = CreateRobot(0,0,0);
             //Robot r1 = CreateRobot(0, 0, 20);
@@ -23,77 +25,179 @@ namespace Models {
         private void Path()
         {
             Graph g = new Graph();
-            int x = 0;
-            int z = 0;
-
             int stepX = 17;
             int stepZ = 20;
 
-            //for (int row = 0; row < 8; row++)
-            //{
-            //    for (int column = 0; column < 9; column++)
-            //    {
-            //        if (column == 0 || column == 9)
-            //            g.add_vertex(
-            //                row.ToString() + column.ToString(),
-            //                new Dictionary<string, Node>() {
-            //                    { "B",  new Node {
-            //                            x = column * stepX,
-            //                            y = 0,
-            //                            z = row * stepZ
-            //                        }
-            //                    }
-            //                });
-            //    }
-            //}
+            int rows = 13;
+            int columns = 9;
+
+            int breaksAfterLoadDeck = 7;
+
+            int rackPlaceIndex = 0;
+
+            for (int row = 0; row < rows; row++)
+            {
+                // Dont start adding before break is done
+                if (row != 0 && row < breaksAfterLoadDeck) continue;
+
+                for (int column = 0; column < columns; column++)
+                {
+                    // current key
+                    string key = row.ToString() + column.ToString();
+
+                    // keep track of it need a point
+                    bool needsPoint = false;
+
+                    // tempory path points where you can go to from this point
+                    Dictionary<string, Node> vertexDictonary = new Dictionary<string, Node>();
+
+                    // Add the position to the map
+                    Map.Add(key, new Node {
+                        x = column * stepX,
+                        y = 0,
+                        z = row * stepZ
+                    });
+
+                    // Middle point
+                    if (Math.Floor((decimal)(columns / 2)) == column)
+                    {
+                        // Load deck path
+                        if (row == 0)
+                        {
+                            // Add all the paths down path
+                            for (int i = breaksAfterLoadDeck; i < rows; i = i + 2)
+                                vertexDictonary.Add(i.ToString() + column.ToString(), new Node
+                                {
+                                    x = column * stepX,
+                                    y = 0,
+                                    z = i * stepZ
+                                });
+
+                            // Add begin point
+                            vertexDictonary.Add("07", new Node
+                            {
+                                x = 7 * stepX,
+                                y = 0,
+                                z = 0
+                            });
+
+                            needsPoint = true;
+                        }
+                        else
+                            if (row % 2 != 0)
+                            {
+                                // Add all paths on both sides of the middle point
+                                for (int i = 0; i < columns; i++)
+                                    if (i != column)
+                                        vertexDictonary.Add(row.ToString() + i.ToString(), new Node
+                                        {
+                                            x = i * stepX,
+                                            y = 0,
+                                            z = row * stepZ
+                                        });
+
+                                needsPoint = true;
+                            }
+                    // Not a middle point
+                    } else
+                    {
+                        // StartPoint
+                        if (row == 0 && column == 7)
+                        {
+                            // Add starting point
+                            vertexDictonary.Add("04", new Node
+                            {
+                                x = 4 * stepX,
+                                y = 0,
+                                z = 0
+                            });
+
+                            needsPoint = true;
+                        }
+
+                        // Rack row
+                        if (row != 0 && row % 2 == 0)
+                        {
+                            // Add only 2X3 rack places per even row
+                            if ((column > 0 && column < 4) || (column > 4 && column < 8))
+                            {
+                                // Make connection to upper row
+                                vertexDictonary.Add((row - 1).ToString() + column.ToString(), new Node
+                                {
+                                    x = column * stepX,
+                                    y = 0,
+                                    z = (row - 1) * stepZ
+                                });
+
+                                // Add new rack position
+                                RackPositions.Add(rackPlaceIndex, key);
+
+                                // rack index up
+                                rackPlaceIndex++;
+
+                                needsPoint = true;
+                            }
+
+
+                        }// Normal row
+                        else if (row != 0 && row % 2 != 0)
+                        {
+                            // Get the corners
+                            if (column == 0 || column == (columns-1))
+                            {
+                                // get all the corners under it
+                                for (int i = (row + 2); i < rows; i = i + 2)
+                                    vertexDictonary.Add(i.ToString() + column.ToString(), new Node
+                                    {
+                                        x = column * stepX,
+                                        y = 0,
+                                        z = i * stepZ
+                                    });
+
+                                // Get all the points on same row
+                                for (int i = 0; i < columns; i++)
+                                    if (i != column)
+                                        vertexDictonary.Add(row.ToString() + i.ToString(), new Node
+                                        {
+                                            x = i * stepX,
+                                            y = 0,
+                                            z = row * stepZ
+                                        });
+                            }
+                            // Get the points between corners and middle
+                            else
+                            {
+                                // Get all the points on same row
+                                for (int i = 0; i < columns; i++)
+                                    if (i != column)
+                                        vertexDictonary.Add(row.ToString() + i.ToString(), new Node
+                                        {
+                                            x = i * stepX,
+                                            y = 0,
+                                            z = row * stepZ
+                                        });
+
+                                if ((column > 0 && column < 4) || (column > 4 && column < 8))
+                                    // Add rack position under it
+                                    vertexDictonary.Add((row + 1).ToString() + column.ToString(), new Node
+                                    {
+                                        x = column * stepX,
+                                        y = 0,
+                                        z = (row + 1) * stepZ
+                                    });
+                            }
+
+                            needsPoint = true;
+                        }
+                    }
+                    
+                    if(needsPoint)
+                        g.add_vertex(key, vertexDictonary);
+                }
+            }
 
             Robot rr = CreateRobot(0);
-
-            g.add_vertex("03", new Dictionary<string, Node>() {
-                { "73", new Node{ x = 68, z = 160 } },
-                { "93",  new Node{ x = 68, z = 200 } },
-                { "113",  new Node{ x = 68, z = 240 } }
-            });
-
-            g.add_vertex("04", new Dictionary<string, Node>() {
-                { "03", new Node{ x = 68, z = 0 } }
-            });
-
-            g.add_vertex("70", new Dictionary<string, Node>() {
-                { "120", new Node{ x = 0, z = 240 } }
-            });
-
-            g.add_vertex("120", new Dictionary<string, Node>() {});
-
-            g.add_vertex("73", new Dictionary<string, Node>() {
-                { "70", new Node{ x = 0, z = 160 } }
-            });
-
-            g.add_vertex("93", new Dictionary<string, Node>() {});
-            g.add_vertex("113", new Dictionary<string, Node>() { });
-
-            //g.shortest_path("04", "03").ForEach(
-            //        xy => Console.WriteLine(xy)
-            //    );
-
-            rr.Move(g.shortest_path("04", "120"));
-
-            //g.shortest_path("04", "120").ForEach(
-            //       zx => rr.Move(zx)
-            //   );
-
-            //g.add_vertex("B", new Dictionary<string, Node>() { { "A", 7 }, { "F", 2 } });
-            //g.add_vertex("C", new Dictionary<string, Node>() { { "A", 8 }, { "F", 6 }, { "G", 4 } });
-            //g.add_vertex("D", new Dictionary<string, Node>() { { "F", 8 } });
-            //g.add_vertex("E", new Dictionary<string, Node>() { { "H", 1 } });
-            //g.add_vertex("F", new Dictionary<string, Node>() { { "B", 2 }, { "C", 6 }, { "D", 8 }, { 'G', 9 }, { 'H', 3 } });
-            //g.add_vertex("G", new Dictionary<string, Node>() { { "C", 4 }, { "F", 9 } });
-            //g.add_vertex("H", new Dictionary<string, Node>() { { "E", 1 }, { "F", 3 } });
-
-            //g.shortest_path('A', 'H')
-            //    .ForEach(
-            //        x => Console.WriteLine(x)
-            //    );
+            rr.Move(g.shortest_path("04", "111"));
         }
 
         private Robot CreateRobot(double x, double y, double z, int ID) {

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Models
 {
@@ -14,8 +13,12 @@ namespace Models
         public void add_vertex(string name, Dictionary<string, Node> edges)
         {
             vertices[name] = edges;
-            
-            edges.ToList().ForEach(x => nodesSmall.Add(x.Key, x.Value));
+
+            edges.ToList().ForEach(
+                x => {
+                    if (!nodesSmall.ContainsKey(x.Key))
+                        nodesSmall.Add(x.Key, x.Value);
+                });
         }
 
         public Node[] shortest_path(string start, string finish)
