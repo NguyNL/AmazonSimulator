@@ -197,7 +197,7 @@ namespace Models {
             }
 
             Robot rr = CreateRobot(0);
-            rr.Move(g.shortest_path("04", "111"));
+            rr.Move(g.shortest_path("07", "121"));
         }
 
         private Robot CreateRobot(double x, double y, double z, int ID) {
