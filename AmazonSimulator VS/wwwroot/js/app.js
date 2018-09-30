@@ -744,7 +744,7 @@ window.onload = function () {
 
         if (command.command === "update") {
             if (Object.keys(worldObjects).indexOf(command.parameters.guid) < 0) {
-                console.log(command.parameters);
+                //console.log(command.parameters);
                 if (command.parameters.type === "robot") {
 
                     var robot;
@@ -763,7 +763,7 @@ window.onload = function () {
                    
                     
                     robot.position.x = command.parameters.x;
-                    robot.position.y = command.parameters.y;
+                    robot.position.y = comm and.parameters.y;
                     robot.position.z = command.parameters.z;
 
                     
@@ -772,7 +772,7 @@ window.onload = function () {
 
                 if (command.parameters.type === "doors") {
                     var difference = command.parameters.x - doorRight.position.x;
-                    console.log("difference: " + difference + " doorRight.position.x: " + doorRight.position.x);
+                    
                     doorRight.position.x += difference;
                     doorLeft.position.x -= difference;
                 }
