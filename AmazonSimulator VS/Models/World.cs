@@ -7,11 +7,12 @@ using Microsoft.EntityFrameworkCore.Internal;
 namespace Models {
     public class World : IObservable<Command>, IUpdatable
     {
-        private List<Robot> worldObjects = new List<Robot>();
+        private List<Object> worldObjects = new List<Object>();
         private List<IObserver<Command>> observers = new List<IObserver<Command>>();
         private Dictionary<string, Node> Map = new Dictionary<string, Node>();
         private Dictionary<int, string> RackPositions = new Dictionary<int, string>();
         private Dictionary<int, string> RobotPositions = new Dictionary<int, string>();
+        static public LoadDeckDoors Doors;
         //private List<Node> nodeList = new List<Node>();
 
 
@@ -19,6 +20,7 @@ namespace Models {
             //Robot r = CreateRobot(0,0,0);
             //Robot r1 = CreateRobot(0, 0, 20);
             //r.Move(4.6, 0, 13);
+            Doors = CreateDoors(0);
 
             Path();
         }
@@ -87,6 +89,14 @@ namespace Models {
                         else
                             if (row % 2 != 0)
                             {
+                                // Add begin point
+                                vertexDictonary.Add("04", new Node
+                                {
+                                    x = 4 * stepX,
+                                    y = 0,
+                                    z = 0
+                                });
+
                                 // Add all paths on both sides of the middle point
                                 for (int i = 0; i < columns; i++)
                                     if (i != column)
@@ -97,7 +107,17 @@ namespace Models {
                                             z = row * stepZ
                                         });
 
-                                needsPoint = true;
+                                // Add all paths from bottom - top middle point
+                                for (int i = breaksAfterLoadDeck; i < rows; i = i + 2)
+                                    if (i != row)
+                                        vertexDictonary.Add(i.ToString() + column.ToString(), new Node
+                                        {
+                                            x = column * stepX,
+                                            y = 0,
+                                            z = i * stepZ
+                                        });
+
+                            needsPoint = true;
                             }
                     // Not a middle point
                     } else
@@ -147,13 +167,14 @@ namespace Models {
                             if (column == 0 || column == (columns-1))
                             {
                                 // get all the corners under it
-                                for (int i = (row + 2); i < rows; i = i + 2)
-                                    vertexDictonary.Add(i.ToString() + column.ToString(), new Node
-                                    {
-                                        x = column * stepX,
-                                        y = 0,
-                                        z = i * stepZ
-                                    });
+                                for (int i = breaksAfterLoadDeck; i < rows; i = i + 2)
+                                    if (i != row)
+                                        vertexDictonary.Add(i.ToString() + column.ToString(), new Node
+                                        {
+                                            x = column * stepX,
+                                            y = 0,
+                                            z = i * stepZ
+                                        });
 
                                 // Get all the points on same row
                                 for (int i = 0; i < columns; i++)
@@ -197,10 +218,12 @@ namespace Models {
                 }
             }
 
+            
             Robot rr = CreateRobot(0);
 
             rr.Move(g.shortest_path(rr.Position, "121"), "121");
             rr.Move(g.shortest_path(rr.Position, "101"), "101");
+            rr.Move(g.shortest_path(rr.Position, "07"), "07");
         }
 
         private Robot CreateRobot(double x, double y, double z, int ID) {
@@ -212,6 +235,13 @@ namespace Models {
         private Robot CreateRobot(int ID)
         {
             Robot r = new Robot(ID);
+            worldObjects.Add(r);
+            return r;
+        }
+
+        private LoadDeckDoors CreateDoors(int ID)
+        {
+            LoadDeckDoors r = new LoadDeckDoors(ID);
             worldObjects.Add(r);
             return r;
         }
@@ -233,7 +263,7 @@ namespace Models {
         }
 
         private void SendCreationCommandsToObserver(IObserver<Command> obs) {
-            foreach(Robot m3d in worldObjects) {
+            foreach(Object m3d in worldObjects) {
                 obs.OnNext(new UpdateModel3DCommand(m3d));
             }
         }
@@ -241,7 +271,7 @@ namespace Models {
         public bool Update(int tick)
         {
             for(int i = 0; i < worldObjects.Count; i++) {
-                Robot u = worldObjects[i];
+                var u = worldObjects[i];
 
                 if(u is IUpdatable) {
                     bool needsCommand = ((IUpdatable)u).Update(tick);

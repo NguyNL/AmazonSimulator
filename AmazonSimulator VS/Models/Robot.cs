@@ -31,6 +31,11 @@ namespace Models {
 
         public void MoveOverPath(Node[] path)
         {
+            if ((this.x >= 68 && this.x < 70) && this.z >= 0 && this.z < 110)
+                World.Doors.Open();
+            else
+                World.Doors.Close();
+
             this.z = path.First().x == this.x ?
                 path.First().z > this.z ? 
                 this.z += Speed : 

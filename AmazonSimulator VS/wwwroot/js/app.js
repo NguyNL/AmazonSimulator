@@ -51,6 +51,10 @@ window.onload = function () {
         loadProcess = 0,
         unloadProcess = 0;
 
+        // Doors loadingdeck
+        //doorRight,
+        //doorLeft;
+
     /**
      ** GROUPS
      **/
@@ -88,7 +92,7 @@ window.onload = function () {
     var warehouseGrid = new THREE.Group();
     warehouseGrid.rotation.y = 90 * Math.PI / 180;
     warehouseGrid.position.x = 3.8;
-    warehouseGrid.position.z = 29.2;
+    warehouseGrid.position.z = 30;
     warehouse.add(warehouseGrid);
 
     // Robot
@@ -96,6 +100,25 @@ window.onload = function () {
     robotsGroup.position.y = 0.2;
     robotsGroup.scale.set(0.06, 0.06, 0.06);
     warehouseGrid.add(robotsGroup);
+
+    // Doors
+    var doorLeft = new THREE.Group();
+    var doorRight = new THREE.Group();
+
+    doorRight.position.z = -1.48;
+    doorLeft.position.z = -1.48;
+
+    doorRight.position.y = 7;
+    doorLeft.position.y = 7;
+
+    doorRight.position.x = 7.95;
+    doorLeft.position.x = 7.95;
+
+    doorRight.scale.set(12, 12, 12);
+    doorLeft.scale.set(12, 12, 12);
+
+    warehouseGrid.add(doorLeft);
+    warehouseGrid.add(doorRight);
 
     function makeFilledRack(onload) {
         var rack = new THREE.Group();
@@ -684,42 +707,8 @@ window.onload = function () {
             mesh.rotation.y = 1.57;
             mesh.scale.set(10, 10, 10);
 
-            var doorRight = mesh.getObjectByName("DoorRight_factory.002");
-            var doorLeft = mesh.getObjectByName("DoorLeft_factory.001");
-
-            doorRight.position.z -= 0.0001;
-            doorLeft.position.z -= 0.0001;
-
-            mesh.cursor = 'pointer';
-
-            mesh.on('mousedown', function (ev) {
-                if (doorIsOpen) {
-                    clearInterval(doorOpenAnimation);
-                    doorOpenAnimation = setInterval(function () {
-                        doorRight.position.x -= 0.005;
-                        doorLeft.position.x += 0.005;
-
-                        if (doorRight.position.x <= 0)
-                            clearInterval(doorOpenAnimation);
-                    }, 10);
-
-                    doorIsOpen = false;
-                }
-
-                else {
-                    clearInterval(doorOpenAnimation);
-                    doorOpenAnimation = setInterval(function () {
-                        doorRight.position.x += 0.01;
-                        doorLeft.position.x -= 0.01;
-
-                        if (doorRight.position.x > 0.13)
-                            clearInterval(doorOpenAnimation);
-                    }, 10);
-
-                    doorIsOpen = true;
-                }
-
-            });
+            doorRight.add(mesh.getObjectByName("DoorRight_factory.002"));
+            doorLeft.add(mesh.getObjectByName("DoorLeft_factory.001"));
 
             warehouse.add(mesh);
         });
@@ -755,6 +744,7 @@ window.onload = function () {
 
         if (command.command === "update") {
             if (Object.keys(worldObjects).indexOf(command.parameters.guid) < 0) {
+                console.log(command.parameters);
                 if (command.parameters.type === "robot") {
 
                     var robot;
@@ -778,6 +768,13 @@ window.onload = function () {
 
                     
                     robotsGroup.add(robot);
+                }
+
+                if (command.parameters.type === "doors") {
+                    var difference = command.parameters.x - doorRight.position.x;
+                    console.log("difference: " + difference + " doorRight.position.x: " + doorRight.position.x);
+                    doorRight.position.x += difference;
+                    doorLeft.position.x -= difference;
                 }
             }
         }
