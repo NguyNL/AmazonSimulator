@@ -6731,7 +6731,7 @@
       ]
     },
     "Microsoft.Extensions.PlatformAbstractions/1.1.0": {
-      "sha512": "H6ZsQzxYw/6k2DfEQRXdC+vQ6obd6Uba3uGJrnJ2vG4PRXjQZ7seB13JdCfE72abp8E6Fk3gGgDzfJiLZi5ZpQ==",
+      "sha512": "UMlN++q5qqzQ2HH+uOrKxN5fmBXMQDhrYkSaPJxhmyzfJaFPirrVr1raim/Ocq1psAZoB9+7JSAf0GDAX35wUg==",
       "type": "package",
       "path": "microsoft.extensions.platformabstractions/1.1.0",
       "files": [
@@ -11478,7 +11478,7 @@
       ]
     },
     "System.Security.Cryptography.Xml/4.4.2": {
-      "sha512": "1m+fKVrApgKYMRuE0MF0vGjqy4XqAp1rCtyAzMXhJajMDDytMh/rHk9hp4M7KKk3QQZoWJUvyUY7xcw74w+JiQ==",
+      "sha512": "q9Dren/YP5jhRCkDvLfuaPpMTQzP97ANvzq/OoGgwK8YdLRSTABS9oW5/23OKoM2DRCuBrh4qaecD2YNhPtuzQ==",
       "type": "package",
       "path": "system.security.cryptography.xml/4.4.2",
       "files": [
@@ -12663,23 +12663,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\j_kui\\.nuget\\packages\\": {},
+    "C:\\Users\\Moopey\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\j_kui\\source\\repos\\AmazonSimulator\\AmazonSimulator VS\\AmazonSimulator VS.csproj",
+      "projectUniqueName": "D:\\Google Drive\\Programming\\source\\AmazonSimulator\\AmazonSimulator VS\\AmazonSimulator VS.csproj",
       "projectName": "AmazonSimulator VS",
-      "projectPath": "C:\\Users\\j_kui\\source\\repos\\AmazonSimulator\\AmazonSimulator VS\\AmazonSimulator VS.csproj",
-      "packagesPath": "C:\\Users\\j_kui\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\j_kui\\source\\repos\\AmazonSimulator\\AmazonSimulator VS\\obj\\",
+      "projectPath": "D:\\Google Drive\\Programming\\source\\AmazonSimulator\\AmazonSimulator VS\\AmazonSimulator VS.csproj",
+      "packagesPath": "C:\\Users\\Moopey\\.nuget\\packages\\",
+      "outputPath": "D:\\Google Drive\\Programming\\source\\AmazonSimulator\\AmazonSimulator VS\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\j_kui\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Moopey\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

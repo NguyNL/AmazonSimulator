@@ -101,6 +101,12 @@ window.onload = function () {
     robotsGroup.scale.set(0.06, 0.06, 0.06);
     warehouseGrid.add(robotsGroup);
 
+    // Rack
+    var racksGroup = new THREE.Group();
+    racksGroup.position.y = 1.65;
+    racksGroup.scale.set(0.06, 0.06, 0.06);
+    warehouseGrid.add(racksGroup);
+
     // Doors
     var doorLeft = new THREE.Group();
     var doorRight = new THREE.Group();
@@ -738,6 +744,7 @@ window.onload = function () {
     }
 
     robots = {};
+    racks = {};
     exampleSocket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/connect_client");
     exampleSocket.onmessage = function (event) {
         var command = parseCommand(event.data);
@@ -757,17 +764,42 @@ window.onload = function () {
                             robot = new Robot();
 
                         robots[command.parameters.ID] = robot;
+                        robotsGroup.add(robot);
                     } else {
                         robot = robots[command.parameters.ID];
                     }
                    
                     
                     robot.position.x = command.parameters.x;
-                    robot.position.y = comm and.parameters.y;
+                    robot.position.y = command.parameters.y;
                     robot.position.z = command.parameters.z;
+                    robot.rotation.y = command.parameters.rotationY;
+                }
 
-                    
-                    robotsGroup.add(robot);
+                if (command.parameters.type === "rack") {
+
+                    var rack;
+
+                    if (!(command.parameters.ID in racks)) {
+
+                        if (racksGroup.children.length > 0)
+                            rack = new Rack(racksGroup.children[0]);
+                        else
+                            rack = new Rack();
+
+                        racks[command.parameters.ID] = rack;
+                        racksGroup.add(rack);
+
+                    } else {
+                        rack = racks[command.parameters.ID];
+                    }
+
+                    rack.scale.set(25, 25, 25);
+                    rack.position.x = command.parameters.x;
+                    rack.position.y = command.parameters.y;
+                    rack.position.z = command.parameters.z;
+
+                    console.log(rack);
                 }
 
                 if (command.parameters.type === "doors") {

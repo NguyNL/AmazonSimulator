@@ -41,3 +41,14 @@ F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\
 F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.dll
 F:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.pdb
 C:\Users\j_kui\source\repos\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.csprojAssemblyReference.cache
+D:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.csprojAssemblyReference.cache
+D:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.csproj.CoreCompileInputs.cache
+D:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.AssemblyInfoInputs.cache
+D:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.AssemblyInfo.cs
+D:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.dll
+D:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\obj\Debug\netcoreapp2.0\AmazonSimulator VS.pdb
+D:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\bin\Debug\netcoreapp2.0\AmazonSimulator VS.deps.json
+D:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\bin\Debug\netcoreapp2.0\AmazonSimulator VS.runtimeconfig.json
+D:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\bin\Debug\netcoreapp2.0\AmazonSimulator VS.runtimeconfig.dev.json
+D:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\bin\Debug\netcoreapp2.0\AmazonSimulator VS.dll
+D:\Google Drive\Programming\source\AmazonSimulator\AmazonSimulator VS\bin\Debug\netcoreapp2.0\AmazonSimulator VS.pdb

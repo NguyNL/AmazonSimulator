@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Models
 {
-    interface IRobotTask
+    interface ITask<T>
     {
-        void StartTask(Robot r);
-        bool TaskComplete(Robot r);
+        void StartTask(T r);
+        bool TaskComplete(T r);
     }
 }

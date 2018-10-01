@@ -220,7 +220,9 @@ namespace Models {
 
             
             Robot rr = CreateRobot(0);
+            //Rack rrr = CreateRack(0);
 
+            //rrr.Move(g.shortest_path(rr.Position, "121"), "121");
             rr.Move(g.shortest_path(rr.Position, "121"), "121");
             rr.Move(g.shortest_path(rr.Position, "101"), "101");
             rr.Move(g.shortest_path(rr.Position, "07"), "07");
@@ -235,6 +237,20 @@ namespace Models {
         private Robot CreateRobot(int ID)
         {
             Robot r = new Robot(ID);
+            worldObjects.Add(r);
+            return r;
+        }
+
+        private Rack CreateRack(double x, double y, double z, int ID)
+        {
+            Rack r = new Rack(x, y, z, 0, 0, 0, ID);
+            worldObjects.Add(r);
+            return r;
+        }
+
+        private Rack CreateRack(int ID)
+        {
+            Rack r = new Rack(ID);
             worldObjects.Add(r);
             return r;
         }

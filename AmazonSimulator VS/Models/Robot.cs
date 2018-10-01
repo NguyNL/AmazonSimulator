@@ -8,6 +8,7 @@ namespace Models {
         private List<RobotTask> Tasks = new List<RobotTask>();
         private double Speed = 1;
         public string Position { get; private set; }
+        private bool InRotationAnimation = false;
 
         public Robot(double x, double y, double z, double rotationX, double rotationY, double rotationZ, int ID) : base(x,y,z,rotationX,rotationY,rotationZ, ID) {
             this.type = "robot";
@@ -24,7 +25,7 @@ namespace Models {
             this.z =    0;
 
             this.rotationX = 0;
-            this.rotationY = 0;
+            this.rotationY = -90 * Math.PI / 180;
             this.rotationZ = 0;
         }
 
@@ -36,20 +37,84 @@ namespace Models {
             else
                 World.Doors.Close();
 
-            this.z = path.First().x == this.x ?
-                path.First().z > this.z ? 
-                this.z += Speed : 
-                this.z -= Speed : 
-                this.z;
+            if (this.x > path[0].x && this.z == path[0].z)
+            {
+                Console.WriteLine("left: {0} > {1}", this.x, path[0].x);
+                RotateToLeft();
+            }
+            else if(this.x < path[0].x && this.z == path[0].z)
+            {
+                Console.WriteLine("right: {0} < {1}", this.x, path[0].x);
+                RotateToRight();
+            }
+            else if(this.z < path[0].z && this.x == path[0].x)
+            {
+                RotateToUp();
+            }
+            else if(this.z > path[0].z && this.x == path[0].x)
+            {
+                Console.WriteLine("right: {0} < {1}", this.x, path[0].x);
+                RotateToDown();
+            }
 
-            this.x = path.First().z == this.z ?
-                path.First().x > this.x ?
-                this.x += Speed :
-                this.x -= Speed :
-                this.x;
+            if(!InRotationAnimation)
+            {
+                this.z = path.First().x == this.x ?
+                    path.First().z > this.z ?
+                    this.z += Speed :
+                    this.z -= Speed :
+                    this.z;
+
+                this.x = path.First().z == this.z ?
+                    path.First().x > this.x ?
+                    this.x += Speed :
+                    this.x -= Speed :
+                    this.x;
+            }
 
             if (path.First().x == this.x && path.First().z == this.z)
                 Tasks.First().RemovePath();
+        }
+
+        public void RotateToLeft()
+        {
+            if(this.rotationY != (-90 * Math.PI / 180))
+            {
+                InRotationAnimation = true;
+                this.rotationY -= 1 * Math.PI / 180;
+            }
+            else
+            {
+                InRotationAnimation = false;
+            }
+            Console.WriteLine("Left: {0}", this.rotationY);
+        }
+
+        public void RotateToRight()
+        {
+            if (this.rotationY != (90 * Math.PI / 180))
+            {
+                this.rotationY += 1 * Math.PI / 180;
+            }
+            else
+            {
+                InRotationAnimation = false;
+            }
+            Console.WriteLine("Right: {0}", this.rotationY);
+        }
+
+        public void RotateToUp()
+        {
+            this.rotationY = 180 * Math.PI / 180;
+            InRotationAnimation = false;
+            Console.WriteLine("Up: {0}", this.rotationY);
+        }
+
+        public void RotateToDown()
+        {
+            this.rotationY = 0 * Math.PI / 180;
+            InRotationAnimation = false;
+            Console.WriteLine("Down: {0}", this.rotationY);
         }
 
         public void Move(Node[] path, string position)
