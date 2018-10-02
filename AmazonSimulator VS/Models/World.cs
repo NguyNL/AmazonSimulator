@@ -220,9 +220,9 @@ namespace Models {
 
             
             Robot rr = CreateRobot(0);
-            //Rack rrr = CreateRack(0);
+            Rack rrr = CreateRack(0);
 
-            //rrr.Move(g.shortest_path(rr.Position, "121"), "121");
+            rrr.Move(g.shortest_path(rr.Position, "121"), "121");
             rr.Move(g.shortest_path(rr.Position, "121"), "121");
             rr.Move(g.shortest_path(rr.Position, "101"), "101");
             rr.Move(g.shortest_path(rr.Position, "07"), "07");

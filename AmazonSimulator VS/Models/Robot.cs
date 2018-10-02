@@ -9,6 +9,7 @@ namespace Models {
         private double Speed = 1;
         public string Position { get; private set; }
         private bool InRotationAnimation = false;
+        private bool FirstMovement = true;
 
         public Robot(double x, double y, double z, double rotationX, double rotationY, double rotationZ, int ID) : base(x,y,z,rotationX,rotationY,rotationZ, ID) {
             this.type = "robot";
@@ -29,8 +30,6 @@ namespace Models {
             this.rotationZ = 0;
         }
 
-        bool RobotPositionCheck = true;
-
         public void MoveOverPath(Node[] path)
         {
             if ((this.x >= 68 && this.x < 70) && this.z >= 0 && this.z < 110)
@@ -38,8 +37,8 @@ namespace Models {
             else
                 World.Doors.Close();
 
-            if (RobotPositionCheck)
-                checkRobotRotationPosition(path[0]);
+            if (FirstMovement)
+                CheckRotationPosition(path[0]);
 
             if(!InRotationAnimation)
             {
@@ -59,31 +58,31 @@ namespace Models {
             if (path.First().x == this.x && path.First().z == this.z)
             {
                 if (path.Length > 1)
-                    checkRobotRotationPosition(path[1]); 
+                    CheckRotationPosition(path[1]); 
                 else
-                   RobotPositionCheck = true;
+                    FirstMovement = true;
             }
 
             if (path.First().x == this.x && path.First().z == this.z && !InRotationAnimation)
                 Tasks.First().RemovePath();
         }
 
-        private void checkRobotRotationPosition(Node node)
+        private void CheckRotationPosition(Node node)
         {
             if (this.x > node.x && this.z == node.z)
-                RotateRobot(-90);
+                RotateObject(-90);
 
             else if (this.x < node.x && this.z == node.z)
-                RotateRobot(90);
+                RotateObject(90);
 
             else if (this.z < node.z && this.x == node.x)
-                RotateRobot(0);
+                RotateObject(0);
 
             else if (this.z > node.z && this.x == node.x)
-                RotateRobot(180);
+                RotateObject(180);
         }
 
-        public void RotateRobot(int degrees)
+        public void RotateObject(int degrees)
         {
             int currentDegrees = (int)(this.rotationY / Math.PI * 180);
 
@@ -95,7 +94,6 @@ namespace Models {
 
             if (currentDegrees != degrees)
             {
-                Console.WriteLine(degrees);
                 InRotationAnimation = true;
                 if (this.rotationY > (degrees * Math.PI / 180))
                 {
@@ -115,10 +113,9 @@ namespace Models {
                     this.rotationY = -90 * Math.PI / 180;
 
                 InRotationAnimation = false;
-                RobotPositionCheck = false;
+                FirstMovement = false;
             }
         }
-
        
         public void Move(Node[] path, string position)
         {

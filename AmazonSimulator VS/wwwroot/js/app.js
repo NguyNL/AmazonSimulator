@@ -103,7 +103,7 @@ window.onload = function () {
 
     // Rack
     var racksGroup = new THREE.Group();
-    racksGroup.position.y = 1.65;
+    racksGroup.position.y = 1.57;
     racksGroup.scale.set(0.06, 0.06, 0.06);
     warehouseGrid.add(racksGroup);
 
@@ -798,6 +798,8 @@ window.onload = function () {
                     rack.position.x = command.parameters.x;
                     rack.position.y = command.parameters.y;
                     rack.position.z = command.parameters.z;
+                    rack.rotation.x = command.parameters.rotationX;
+                    rack.rotation.y = command.parameters.rotationY;
                 }
 
                 if (command.parameters.type === "doors") {
