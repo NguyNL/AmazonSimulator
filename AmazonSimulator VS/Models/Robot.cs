@@ -29,6 +29,7 @@ namespace Models {
             this.rotationZ = 0;
         }
 
+        bool RobotPositionCheck = true;
 
         public void MoveOverPath(Node[] path)
         {
@@ -37,25 +38,8 @@ namespace Models {
             else
                 World.Doors.Close();
 
-            if (this.x > path[0].x && this.z == path[0].z)
-            {
-                Console.WriteLine("left: {0} > {1}", this.x, path[0].x);
-                RotateToLeft();
-            }
-            else if(this.x < path[0].x && this.z == path[0].z)
-            {
-                Console.WriteLine("right: {0} < {1}", this.x, path[0].x);
-                RotateToRight();
-            }
-            else if(this.z < path[0].z && this.x == path[0].x)
-            {
-                RotateToUp();
-            }
-            else if(this.z > path[0].z && this.x == path[0].x)
-            {
-                Console.WriteLine("right: {0} < {1}", this.x, path[0].x);
-                RotateToDown();
-            }
+            if (RobotPositionCheck)
+                checkRobotRotationPosition(path[0]);
 
             if(!InRotationAnimation)
             {
@@ -73,50 +57,69 @@ namespace Models {
             }
 
             if (path.First().x == this.x && path.First().z == this.z)
+            {
+                if (path.Length > 1)
+                    checkRobotRotationPosition(path[1]); 
+                else
+                   RobotPositionCheck = true;
+            }
+
+            if (path.First().x == this.x && path.First().z == this.z && !InRotationAnimation)
                 Tasks.First().RemovePath();
         }
 
-        public void RotateToLeft()
+        private void checkRobotRotationPosition(Node node)
         {
-            if(this.rotationY != (-90 * Math.PI / 180))
+            if (this.x > node.x && this.z == node.z)
+                RotateRobot(-90);
+
+            else if (this.x < node.x && this.z == node.z)
+                RotateRobot(90);
+
+            else if (this.z < node.z && this.x == node.x)
+                RotateRobot(0);
+
+            else if (this.z > node.z && this.x == node.x)
+                RotateRobot(180);
+        }
+
+        public void RotateRobot(int degrees)
+        {
+            int currentDegrees = (int)(this.rotationY / Math.PI * 180);
+
+            if (currentDegrees < 0 && degrees == 180)
+                degrees *= -1;
+
+            if (currentDegrees >= 180 && degrees == -90)
+                degrees = 270;
+
+            if (currentDegrees != degrees)
             {
+                Console.WriteLine(degrees);
                 InRotationAnimation = true;
-                this.rotationY -= 1 * Math.PI / 180;
+                if (this.rotationY > (degrees * Math.PI / 180))
+                {
+                    this.rotationY -= 1 * Math.PI / 180;
+                }
+                else
+                {
+                    this.rotationY += 1 * Math.PI / 180;
+                }
             }
             else
             {
+                if (currentDegrees == -180)
+                    this.rotationY = 180 * Math.PI / 180;
+
+                if (currentDegrees == 270)
+                    this.rotationY = -90 * Math.PI / 180;
+
                 InRotationAnimation = false;
+                RobotPositionCheck = false;
             }
-            Console.WriteLine("Left: {0}", this.rotationY);
         }
 
-        public void RotateToRight()
-        {
-            if (this.rotationY != (90 * Math.PI / 180))
-            {
-                this.rotationY += 1 * Math.PI / 180;
-            }
-            else
-            {
-                InRotationAnimation = false;
-            }
-            Console.WriteLine("Right: {0}", this.rotationY);
-        }
-
-        public void RotateToUp()
-        {
-            this.rotationY = 180 * Math.PI / 180;
-            InRotationAnimation = false;
-            Console.WriteLine("Up: {0}", this.rotationY);
-        }
-
-        public void RotateToDown()
-        {
-            this.rotationY = 0 * Math.PI / 180;
-            InRotationAnimation = false;
-            Console.WriteLine("Down: {0}", this.rotationY);
-        }
-
+       
         public void Move(Node[] path, string position)
         {
             Tasks.Add(new RobotTask(path));

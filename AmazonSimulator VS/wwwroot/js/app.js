@@ -798,8 +798,6 @@ window.onload = function () {
                     rack.position.x = command.parameters.x;
                     rack.position.y = command.parameters.y;
                     rack.position.z = command.parameters.z;
-
-                    console.log(rack);
                 }
 
                 if (command.parameters.type === "doors") {

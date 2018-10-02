@@ -14,10 +14,15 @@ class Robot extends THREE.Group {
             return;
 
         this._loadState = LoadStates.LOADING;
-        
-        if (this.obj) selfRef.add(this._obj.clone());
+        var selfRef = this;
+
+        if (this._obj) {
+            var clone = this._obj.clone();
+            clone.position.x = 0;
+            clone.position.z = 0;
+            selfRef.add(clone);
+        }
         else {
-            var selfRef = this;
             Loading.OBJModel('obj/robot/', 'robot.obj', 'obj/robot/', 'robot.mtl', (mesh) => {
                 selfRef.add(mesh);
                 selfRef._loadState = LoadStates.LOADED;
