@@ -36,7 +36,7 @@ namespace Models
             this.z = 0;
 
             this.rotationX = 180 * Math.PI / 180;
-            this.rotationY = -90 * Math.PI / 180;
+            this.rotationY = 90 * Math.PI / 180;
             this.rotationZ = 0;
 
             FillRack();
@@ -152,10 +152,10 @@ namespace Models
         private void CheckRotationPosition(Node node)
         {
             if (this.x > node.x && this.z == node.z)
-                RotateObject(-90);
+                RotateObject(90);
 
             else if (this.x < node.x && this.z == node.z)
-                RotateObject(90);
+                RotateObject(-90);
 
             else if (this.z < node.z && this.x == node.x)
                 RotateObject(0);

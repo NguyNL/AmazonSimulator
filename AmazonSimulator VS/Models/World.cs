@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Controllers;
 using Microsoft.EntityFrameworkCore.Internal;
 
@@ -13,6 +16,9 @@ namespace Models {
         private Dictionary<int, string> RackPositions = new Dictionary<int, string>();
         private Dictionary<int, string> RobotPositions = new Dictionary<int, string>();
         static public LoadDeckDoors Doors;
+        private Graph g { get; set; }
+        private List<Robot> allRobots = new List<Robot>();
+        private List<Rack> allRacks = new List<Rack>();
         //private List<Node> nodeList = new List<Node>();
 
 
@@ -24,14 +30,14 @@ namespace Models {
 
         private void Path()
         {
-            Graph g = new Graph();
+            g = new Graph();
             int stepX = 25;
-            int stepZ = 20;
+            int stepZ = 25;
 
-            int rows = 13;
+            int rows = 11;
             int columns = 9;
 
-            int breaksAfterLoadDeck = 7;
+            int breaksAfterLoadDeck = 5;
 
             int rackPlaceIndex = 0;
 
@@ -84,7 +90,7 @@ namespace Models {
                             needsPoint = true;
                         }
                         else
-                            if (row % 2 != 0)
+                            if (row % 2 == breaksAfterLoadDeck % 2)
                             {
                                 // Add begin point
                                 vertexDictonary.Add("04", new Node
@@ -134,7 +140,7 @@ namespace Models {
                         }
 
                         // Rack row
-                        if (row != 0 && row % 2 == 0)
+                        if (row != 0 && row % 2 != breaksAfterLoadDeck % 2)
                         {
                             // Add only 2X3 rack places per even row
                             if ((column > 0 && column < 4) || (column > 4 && column < 8))
@@ -158,7 +164,7 @@ namespace Models {
 
 
                         }// Normal row
-                        else if (row != 0 && row % 2 != 0)
+                        else if (row != 0 && row % 2 == breaksAfterLoadDeck % 2)
                         {
                             // Get the corners
                             if (column == 0 || column == (columns-1))
@@ -215,53 +221,66 @@ namespace Models {
                 }
             }
 
-            string[] coordsArray = {
-                "81", "82", "83", "85", "86", "87",
-                "101", "102", "103", "105", "106" //, "107"
-            };
+            Thread t = new Thread(new ThreadStart(startFilling));
+            t.Start();
+        }
 
-            foreach(string coord in coordsArray)
+        public void startFilling()
+        {
+            foreach (KeyValuePair<int, string> coord in RackPositions)
             {
                 Robot r = CreateRobot();
                 Rack ra = CreateRack();
 
-                r.Move(g.shortest_path(r.Position, coord), coord);
-                ra.Move(g.shortest_path(ra.Position, coord), coord);
+                worldObjects.Add(r);
+                worldObjects.Add(ra);
+
+                r.Move(g.shortest_path(r.Position, coord.Value), coord.Value);
+                ra.Move(g.shortest_path(ra.Position, coord.Value), coord.Value);
+
+                Thread.Sleep(6000);
             }
+
+            allRobots[0].Move(g.shortest_path(allRobots[0].Position, "07"), "07");
+            allRacks[0].Move(g.shortest_path(allRacks[0].Position, "07"), "07");
         }
 
         private Robot CreateRobot(double x, double y, double z) {
-            Robot r = new Robot(x,y,z,0,0,0);
-            worldObjects.Add(r);
-            return r;
+            Robot robot = new Robot(x,y,z,0,0,0);
+            worldObjects.Add(robot);
+            allRobots.Add(robot);
+            return robot;
         }
 
         private Robot CreateRobot()
         {
-            Robot r = new Robot();
-            worldObjects.Add(r);
-            return r;
+            Robot robot = new Robot();
+            worldObjects.Add(robot);
+            allRobots.Add(robot);
+            return robot;
         }
 
         private Rack CreateRack(double x, double y, double z)
         {
-            Rack r = new Rack(x, y, z, 0, 0, 0);
-            worldObjects.Add(r);
-            return r;
+            Rack rack = new Rack(x, y, z, 0, 0, 0);
+            worldObjects.Add(rack);
+            allRacks.Add(rack);
+            return rack;
         }
 
         private Rack CreateRack()
         {
-            Rack r = new Rack();
-            worldObjects.Add(r);
-            return r;
+            Rack rack = new Rack();
+            worldObjects.Add(rack);
+            allRacks.Add(rack);
+            return rack;
         }
 
         private LoadDeckDoors CreateDoors()
         {
-            LoadDeckDoors r = new LoadDeckDoors();
-            worldObjects.Add(r);
-            return r;
+            LoadDeckDoors doors = new LoadDeckDoors();
+            worldObjects.Add(doors);
+            return doors;
         }
 
         public IDisposable Subscribe(IObserver<Command> observer)
@@ -290,24 +309,7 @@ namespace Models {
         {
             for(int i = 0; i < worldObjects.Count; i++) {
                 var u = worldObjects[i];
-
-                //if (u is Rack && u is IUpdatable)
-                //{
-                //    bool needsCommand = ((IUpdatable)u).Update(tick);
-                //    if (needsCommand)
-                //    {
-                //        SendCommandToObservers(new UpdateModel3DCommand(u));
-                //    }
-
-                //    //foreach (Box box in (u as Rack).Boxes)
-                //    //{
-                //    //    needsCommand = box.Update(tick);
-                //    //    if (needsCommand)
-                //    //    {
-                //    //        SendCommandToObservers(new UpdateModel3DCommand(box));
-                //    //    }
-                //    //}
-                //}else 
+                
                 if (u is IUpdatable) {
                     bool needsCommand = ((IUpdatable)u).Update(tick);
 
