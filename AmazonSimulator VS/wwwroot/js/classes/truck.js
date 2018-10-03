@@ -1,11 +1,11 @@
-var instanceRobot = false;
-var firstLoadRobot = true;
+var instanceTruck = false;
+var firstLoadTruck = true;
 
-class Robot extends THREE.Group {
-    constructor() {
+class Truck extends THREE.Group {
+    constructor(obj = false) {
         super();
 
-        //this._obj = obj;
+        this._obj = obj;
         this._loadState = LoadStates.NOT_LOADING;
         this.init();
     }
@@ -20,21 +20,21 @@ class Robot extends THREE.Group {
 
         var selfRef = this;
 
-        if (!firstLoadRobot) {
-            var checkExistInstanceRobot = setInterval(function () {
-                if (instanceRobot) {
-                    this.clearInterval(checkExistInstanceRobot);
+        if (!firstLoadTruck) {
+            var checkExistInstanceTruck = setInterval(function () {
+                if (instanceTruck) {
+                    this.clearInterval(checkExistInstanceTruck);
 
-                    var clone = instanceRobot.clone();
+                    var clone = instanceTruck.clone();
                     clone.position.set(0, 0, 0);
                     selfRef.add(clone);
                 }
             }, 100);
         }
         else {
-            firstLoadRobot = false;
-            Loading.OBJModel('obj/robot/', 'robot.obj', 'obj/robot/', 'robot.mtl', (mesh) => {
-                instanceRobot = mesh;
+            firstLoadTruck = false;
+            Loading.OBJModel('obj/truck/', 'truck.obj', 'obj/truck/', 'truck.mtl', (mesh) => {
+                instanceTruck = mesh;
                 selfRef.add(mesh);
                 selfRef._loadState = LoadStates.LOADED;
             });
@@ -45,5 +45,5 @@ class Robot extends THREE.Group {
     get loadState() {
         return this._loadState;
     }
-    
+
 };

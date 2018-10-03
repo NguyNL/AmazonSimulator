@@ -18,9 +18,9 @@ class Box extends THREE.Group {
 
         this._loadState = LoadStates.LOADING;
 
-        if (!firstLoadBox) {
-            var selfRef = this;
+        var selfRef = this;
 
+        if (!firstLoadBox) {
             var checkExistInstance = setInterval(function () {
                 if (instanceBox) {
                     this.clearInterval(checkExistInstance);
@@ -33,7 +33,6 @@ class Box extends THREE.Group {
         }
         else {
             firstLoadBox = false;
-            var selfRef = this;
             Loading.OBJModel('obj/cardboard_box/', 'cardboard_box.obj', 'obj/cardboard_box/', 'cardboard_box.mtl', (mesh) => {
                 instanceBox = mesh;
                 selfRef.add(mesh);

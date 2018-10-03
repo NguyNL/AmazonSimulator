@@ -42,22 +42,22 @@ window.onload = function () {
      **/
     var platformGroup = new THREE.Group();
 
-    // Truck
-    var truck = new THREE.Group();
-    truck.scale.set(20, 20, 20);
-    truck.position.x = truckX;
-    truck.position.z = 0;
+    //// Truck
+    //var truck = new THREE.Group();
+    //truck.scale.set(20, 20, 20);
+    //truck.position.x = truckX;
+    //truck.position.z = 0;
 
-    // Boat
-    var boat = new THREE.Group();
-    var boatContainer = new THREE.Group();
-    boatContainer.position.x = -1.16;
-    boatContainer.position.z = -0.632;
-    boatContainer.position.y = 2.4;
+    ////Boat
+    //var boat = new THREE.Group();
+    //var boatContainer = new THREE.Group();
+    //boatContainer.position.x = -1.16;
+    //boatContainer.position.z = -0.632;
+    //boatContainer.position.y = 2.4;
 
-    boat.scale.set(20, 20, 20);
-    boat.position.x = boatX;
-    boat.position.z = 16;//boatZ;
+    //boat.scale.set(20, 20, 20);
+    //boat.position.x = boatX;
+    //boat.position.z = 16;//boatZ;
 
     // CraneMove
     var cranemove = new THREE.Group();
@@ -114,9 +114,13 @@ window.onload = function () {
          **/
         camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1500);
         cameraControls = new THREE.OrbitControls(camera);
-        camera.position.z = 15;
-        camera.position.y = 5;
-        camera.position.x = 15;
+        camera.position.z = -5;
+        camera.position.y = 6;
+        camera.position.x = 50;
+        cameraControls.minDistance = 10;
+        cameraControls.maxDistance = 50;
+        cameraControls.maxPolarAngle = Math.PI / 2;
+        cameraControls.maxZoom = 10;
         cameraControls.update();
         scene = new THREE.Scene();
 
@@ -130,6 +134,30 @@ window.onload = function () {
         window.addEventListener('resize', onWindowResize, false);
 
         THREE.Loader.Handlers.add(/\.tga$/i, new THREE.TGALoader());
+
+        function onPositionChange() {
+            if (cameraControls.target.x > 100) {
+                camera.position.x = 100;
+                cameraControls.target.x = 100;
+            }
+
+            if (cameraControls.target.x < -100) {
+                camera.position.x = -100;
+                cameraControls.target.x = -100;
+            }
+
+            if (cameraControls.target.z > 100) {
+                camera.position.z = 100;
+                cameraControls.target.z = 100;
+            }
+
+            if (cameraControls.target.z < -100) {
+                camera.position.z = -100;
+                cameraControls.target.z = -100;
+            }
+        }
+
+        cameraControls.addEventListener('change', onPositionChange);
 
         /**
          ** SKYBOX
@@ -538,7 +566,7 @@ window.onload = function () {
         /**
          ** PLATFORM(WORLD) LOADING
          **/
-        Loading.OBJModel('obj/platform/', 'platform.obj', 'obj/platform/', 'platform.mtl', (mesh) => {
+        Loading.OBJModel('obj/platform/', 'bigger_platform.obj', 'obj/platform/', 'bigger_platform.mtl', (mesh) => {
             mesh.scale.set(20, 20, 20);
 
             mesh.position.y = 0;
@@ -550,27 +578,6 @@ window.onload = function () {
             cranemove.add(mesh.getObjectByName("CraneMoveBlock_3_mesh1358320812"));
 
             var crane = mesh.getObjectByName("Crane_mesh915592506");
-
-            truck.add(mesh.getObjectByName("TruckLongOrange.001_mesh1355834799.001"));
-            truck.add(mesh.getObjectByName("ContainerbigTruck_mesh1355834799.003"));
-
-            var boatContainerObj = mesh.getObjectByName("containerBoat_mesh1355834799.000");
-            boat.add(mesh.getObjectByName("Boat_mesh1196106066"));
-            boatContainer.add(boatContainerObj);
-            boatContainerObj.position.set(1.16, - 2.4, 0.632);
-            boat.add(boatContainer);
-
-            boat.cursor = 'pointer';
-            truck.cursor = 'pointer';
-            truck.children[1].position.y = -0.01;
-
-            truck.on('mousedown', function (ev) {
-                getTruckContainer();
-            });
-
-            boat.on('mousedown', function (ev) {
-                getBoatContainer();
-            });
 
             platformGroup.add(mesh);
             platform = mesh;
@@ -599,8 +606,6 @@ window.onload = function () {
          **/
         scene.add(warehouse);
         scene.add(platformGroup);
-        scene.add(truck);
-        scene.add(boat);
         scene.add(cranemove);
     }
 
@@ -674,6 +679,42 @@ window.onload = function () {
                 rack.position.z = command.parameters.z;
                 rack.rotation.x = command.parameters.rotationX;
                 rack.rotation.y = command.parameters.rotationY;
+            }
+
+            if (command.parameters.type === "truck") {
+                var truck;
+
+                if (Object.keys(worldObjects).indexOf(command.parameters.guid) < 0) {
+                    truck = new truck();
+
+                    worldObjects[command.parameters.guid] = truck;
+                    TruckGroup.add(truck);
+                } else {
+                    truck = worldObjects[command.parameters.guid];
+                }
+
+                truck.position.x = command.parameters.x;
+                truck.position.y = command.parameters.y;
+                truck.position.z = command.parameters.z;
+
+                console.log(truck);
+            }
+
+            if (command.parameters.type === "Boat") {
+                var boat;
+
+                if (Object.keys(worldObjects).indexOf(command.parameters.guid) < 0) {
+                    boat = new boat();
+
+                    worldObjects[command.parameters.guid] = boat;
+                    boatGroup.add(boat);
+                } else {
+                    boat = worldObjects[command.parameters.guid];
+                }
+
+                boat.position.x = command.parameters.x;
+                boat.position.y = command.parameters.y;
+                boat.position.z = command.parameters.z;
             }
 
             if (command.parameters.type === "doors") {

@@ -18,9 +18,9 @@ class Rack extends THREE.Group {
 
         this._loadState = LoadStates.LOADING;
 
-        if (!firstLoadRack) {
-            var selfRef = this;
+        var selfRef = this;
 
+        if (!firstLoadRack) {
             var checkExistInstanceRack = setInterval(function () {
                 if (instanceRack) {
                     this.clearInterval(checkExistInstanceRack);
@@ -33,7 +33,6 @@ class Rack extends THREE.Group {
         }
         else {
             firstLoadRobot = false;
-            var selfRef = this;
             Loading.OBJModel('obj/storage_rack/', 'rackpoly.obj', 'obj/storage_rack/', 'rackpoly.mtl', (mesh) => {
                 instanceRack = mesh;
                 selfRef.add(mesh);

@@ -1,11 +1,11 @@
-var instanceRobot = false;
-var firstLoadRobot = true;
+var instanceBoat = false;
+var firstLoadBoat = true;
 
-class Robot extends THREE.Group {
-    constructor() {
+class Boat extends THREE.Group {
+    constructor(obj = false) {
         super();
 
-        //this._obj = obj;
+        this._obj = obj;
         this._loadState = LoadStates.NOT_LOADING;
         this.init();
     }
@@ -20,21 +20,21 @@ class Robot extends THREE.Group {
 
         var selfRef = this;
 
-        if (!firstLoadRobot) {
-            var checkExistInstanceRobot = setInterval(function () {
-                if (instanceRobot) {
-                    this.clearInterval(checkExistInstanceRobot);
+        if (!firstLoadBoat) {
+            var checkExistInstanceBoat = setInterval(function () {
+                if (instanceBoat) {
+                    this.clearInterval(checkExistInstanceBoat);
 
-                    var clone = instanceRobot.clone();
+                    var clone = instanceBoat.clone();
                     clone.position.set(0, 0, 0);
                     selfRef.add(clone);
                 }
             }, 100);
         }
         else {
-            firstLoadRobot = false;
-            Loading.OBJModel('obj/robot/', 'robot.obj', 'obj/robot/', 'robot.mtl', (mesh) => {
-                instanceRobot = mesh;
+            firstLoadBoat = false;
+            Loading.OBJModel('obj/boat/', 'boat.obj', 'obj/boat/', 'boat.mtl', (mesh) => {
+                instanceBoat = mesh;
                 selfRef.add(mesh);
                 selfRef._loadState = LoadStates.LOADED;
             });

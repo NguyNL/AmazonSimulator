@@ -5,24 +5,24 @@ using Newtonsoft.Json;
 
 namespace Models
 {
-    public class Truck : Mesh, IUpdatable
+    public class Boat : Mesh, IUpdatable
     {
         private double Speed = 1;
         public string Position { get; private set; }
         private bool InRotationAnimation = false;
         private bool FirstMovement = true;
 
-        public Truck(double x, double y, double z, double rotationX, double rotationY, double rotationZ) : base(x, y, z, rotationX, rotationY, rotationZ)
+        public Boat(double x, double y, double z, double rotationX, double rotationY, double rotationZ) : base(x, y, z, rotationX, rotationY, rotationZ)
         {
-            this.type = "truck";
+            this.type = "boat";
             this.Position = "07";
             this.guid = Guid.NewGuid();
         }
 
-        public Truck()
+        public Boat()
         {
             this.guid = Guid.NewGuid();
-            this.type = "truck";
+            this.type = "boat";
             this.Position = "07";
 
             this.x = 119;
