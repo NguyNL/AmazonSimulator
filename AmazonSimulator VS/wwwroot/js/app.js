@@ -42,22 +42,20 @@ window.onload = function () {
      **/
     var platformGroup = new THREE.Group();
 
-    //// Truck
-    //var truck = new THREE.Group();
-    //truck.scale.set(20, 20, 20);
-    //truck.position.x = truckX;
-    //truck.position.z = 0;
+    //Truck
+    var truckGroup = new THREE.Group();
+    truckGroup.scale.set(20, 20, 20);
+    truckGroup.position.y = 0;
+    truckGroup.position.z = -26;
 
-    ////Boat
-    //var boat = new THREE.Group();
+    //Boat
+    var boatGroup = new THREE.Group();
+    boatGroup.scale.set(20, 20, 20);
+    boatGroup.position.y = 0;
+    boatGroup.position.x = 2.15;
+    boatGroup.position.z = -2.9;
+
     //var boatContainer = new THREE.Group();
-    //boatContainer.position.x = -1.16;
-    //boatContainer.position.z = -0.632;
-    //boatContainer.position.y = 2.4;
-
-    //boat.scale.set(20, 20, 20);
-    //boat.position.x = boatX;
-    //boat.position.z = 16;//boatZ;
 
     // CraneMove
     var cranemove = new THREE.Group();
@@ -620,6 +618,8 @@ window.onload = function () {
          **/
         scene.add(warehouse);
         scene.add(platformGroup);
+        scene.add(truckGroup);
+        scene.add(boatGroup);
         scene.add(cranemove);
     }
 
@@ -699,10 +699,10 @@ window.onload = function () {
                 var truck;
 
                 if (Object.keys(worldObjects).indexOf(command.parameters.guid) < 0) {
-                    truck = new truck();
+                    truck = new Truck();
 
                     worldObjects[command.parameters.guid] = truck;
-                    TruckGroup.add(truck);
+                    truckGroup.add(truck);
                 } else {
                     truck = worldObjects[command.parameters.guid];
                 }
@@ -710,15 +710,13 @@ window.onload = function () {
                 truck.position.x = command.parameters.x;
                 truck.position.y = command.parameters.y;
                 truck.position.z = command.parameters.z;
-
-                console.log(truck);
             }
 
-            if (command.parameters.type === "Boat") {
+            if (command.parameters.type === "boat") {
                 var boat;
 
                 if (Object.keys(worldObjects).indexOf(command.parameters.guid) < 0) {
-                    boat = new boat();
+                    boat = new Boat();
 
                     worldObjects[command.parameters.guid] = boat;
                     boatGroup.add(boat);
@@ -729,6 +727,7 @@ window.onload = function () {
                 boat.position.x = command.parameters.x;
                 boat.position.y = command.parameters.y;
                 boat.position.z = command.parameters.z;
+                console.log(boat.position.z);
             }
 
             if (command.parameters.type === "doors") {

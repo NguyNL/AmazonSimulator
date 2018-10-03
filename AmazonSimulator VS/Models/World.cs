@@ -24,7 +24,10 @@ namespace Models {
 
         public World() {
             Doors = CreateDoors();
-
+            Boat boat = CreateBoat();
+            boat.MoveToCrane();
+            Truck truck = CreateTruck();
+            truck.MoveToCrane();
             Path();
         }
 
@@ -221,8 +224,8 @@ namespace Models {
                 }
             }
 
-            Thread t = new Thread(new ThreadStart(startFilling));
-            t.Start();
+            //Thread t = new Thread(new ThreadStart(startFilling));
+            //t.Start();
         }
 
         public void startFilling()
@@ -238,7 +241,7 @@ namespace Models {
                 r.Move(g.shortest_path(r.Position, coord.Value), coord.Value);
                 ra.Move(g.shortest_path(ra.Position, coord.Value), coord.Value);
 
-                Thread.Sleep(6000);
+                Thread.Sleep(10000);
             }
 
             allRobots[0].Move(g.shortest_path(allRobots[0].Position, "07"), "07");
@@ -274,6 +277,34 @@ namespace Models {
             worldObjects.Add(rack);
             allRacks.Add(rack);
             return rack;
+        }
+
+        private Truck CreateTruck(double x, double y, double z)
+        {
+            Truck truck = new Truck(x, y, z, 0, 0, 0);
+            worldObjects.Add(truck);
+            return truck;
+        }
+
+        private Truck CreateTruck()
+        {
+            Truck truck = new Truck();
+            worldObjects.Add(truck);
+            return truck;
+        }
+
+        private Boat CreateBoat(double x, double y, double z)
+        {
+            Boat boat = new Boat(x, y, z, 0, 0, 0);
+            worldObjects.Add(boat);
+            return boat;
+        }
+
+        private Boat CreateBoat()
+        {
+            Boat boat = new Boat();
+            worldObjects.Add(boat);
+            return boat;
         }
 
         private LoadDeckDoors CreateDoors()
