@@ -123,6 +123,10 @@ window.onload = function () {
         cameraControls.maxZoom = 10;
         cameraControls.update();
         scene = new THREE.Scene();
+        fogColor = new THREE.Color(0xf1f1f1);
+
+        scene.background = fogColor;
+        scene.fog = new THREE.Fog(fogColor, 0.015, 300);
 
         renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setPixelRatio(window.devicePixelRatio);
