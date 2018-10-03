@@ -1,8 +1,11 @@
+var instanceRobot = false;
+var firstLoadRobot = true;
+
 class Robot extends THREE.Group {
-    constructor(obj = false) {
+    constructor() {
         super();
 
-        this._obj = obj;
+        //this._obj = obj;
         this._loadState = LoadStates.NOT_LOADING;
         this.init();
     }
@@ -14,16 +17,25 @@ class Robot extends THREE.Group {
             return;
 
         this._loadState = LoadStates.LOADING;
-        var selfRef = this;
 
-        if (this._obj) {
-            var clone = this._obj.clone();
-            clone.position.x = 0;
-            clone.position.z = 0;
-            selfRef.add(clone);
+        if (!firstLoadRobot) {
+            var selfRef = this;
+
+            var checkExistInstanceRobot = setInterval(function () {
+                if (instanceRobot) {
+                    this.clearInterval(checkExistInstanceRobot);
+
+                    var clone = instanceRobot.clone();
+                    clone.position.set(0, 0, 0);
+                    selfRef.add(clone);
+                }
+            }, 100);
         }
         else {
+            firstLoadRobot = false;
+            var selfRef = this;
             Loading.OBJModel('obj/robot/', 'robot.obj', 'obj/robot/', 'robot.mtl', (mesh) => {
+                instanceRobot = mesh;
                 selfRef.add(mesh);
                 selfRef._loadState = LoadStates.LOADED;
             });

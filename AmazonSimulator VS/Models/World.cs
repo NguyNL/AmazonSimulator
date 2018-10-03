@@ -17,10 +17,7 @@ namespace Models {
 
 
         public World() {
-            //Robot r = CreateRobot(0,0,0);
-            //Robot r1 = CreateRobot(0, 0, 20);
-            //r.Move(4.6, 0, 13);
-            Doors = CreateDoors(0);
+            Doors = CreateDoors();
 
             Path();
         }
@@ -28,7 +25,7 @@ namespace Models {
         private void Path()
         {
             Graph g = new Graph();
-            int stepX = 17;
+            int stepX = 25;
             int stepZ = 20;
 
             int rows = 13;
@@ -218,46 +215,51 @@ namespace Models {
                 }
             }
 
-            
-            Robot rr = CreateRobot(0);
-            Rack rrr = CreateRack(0);
+            string[] coordsArray = {
+                "81", "82", "83", "85", "86", "87",
+                "101", "102", "103", "105", "106" //, "107"
+            };
 
-            rrr.Move(g.shortest_path(rr.Position, "121"), "121");
-            rr.Move(g.shortest_path(rr.Position, "121"), "121");
-            rr.Move(g.shortest_path(rr.Position, "101"), "101");
-            rr.Move(g.shortest_path(rr.Position, "07"), "07");
+            foreach(string coord in coordsArray)
+            {
+                Robot r = CreateRobot();
+                Rack ra = CreateRack();
+
+                r.Move(g.shortest_path(r.Position, coord), coord);
+                ra.Move(g.shortest_path(ra.Position, coord), coord);
+            }
         }
 
-        private Robot CreateRobot(double x, double y, double z, int ID) {
-            Robot r = new Robot(x,y,z,0,0,0, ID);
+        private Robot CreateRobot(double x, double y, double z) {
+            Robot r = new Robot(x,y,z,0,0,0);
             worldObjects.Add(r);
             return r;
         }
 
-        private Robot CreateRobot(int ID)
+        private Robot CreateRobot()
         {
-            Robot r = new Robot(ID);
+            Robot r = new Robot();
             worldObjects.Add(r);
             return r;
         }
 
-        private Rack CreateRack(double x, double y, double z, int ID)
+        private Rack CreateRack(double x, double y, double z)
         {
-            Rack r = new Rack(x, y, z, 0, 0, 0, ID);
+            Rack r = new Rack(x, y, z, 0, 0, 0);
             worldObjects.Add(r);
             return r;
         }
 
-        private Rack CreateRack(int ID)
+        private Rack CreateRack()
         {
-            Rack r = new Rack(ID);
+            Rack r = new Rack();
             worldObjects.Add(r);
             return r;
         }
 
-        private LoadDeckDoors CreateDoors(int ID)
+        private LoadDeckDoors CreateDoors()
         {
-            LoadDeckDoors r = new LoadDeckDoors(ID);
+            LoadDeckDoors r = new LoadDeckDoors();
             worldObjects.Add(r);
             return r;
         }
@@ -289,7 +291,24 @@ namespace Models {
             for(int i = 0; i < worldObjects.Count; i++) {
                 var u = worldObjects[i];
 
-                if(u is IUpdatable) {
+                //if (u is Rack && u is IUpdatable)
+                //{
+                //    bool needsCommand = ((IUpdatable)u).Update(tick);
+                //    if (needsCommand)
+                //    {
+                //        SendCommandToObservers(new UpdateModel3DCommand(u));
+                //    }
+
+                //    //foreach (Box box in (u as Rack).Boxes)
+                //    //{
+                //    //    needsCommand = box.Update(tick);
+                //    //    if (needsCommand)
+                //    //    {
+                //    //        SendCommandToObservers(new UpdateModel3DCommand(box));
+                //    //    }
+                //    //}
+                //}else 
+                if (u is IUpdatable) {
                     bool needsCommand = ((IUpdatable)u).Update(tick);
 
                     if(needsCommand) {

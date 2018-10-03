@@ -11,13 +11,15 @@ namespace Models {
         private bool InRotationAnimation = false;
         private bool FirstMovement = true;
 
-        public Robot(double x, double y, double z, double rotationX, double rotationY, double rotationZ, int ID) : base(x,y,z,rotationX,rotationY,rotationZ, ID) {
+        public Robot(double x, double y, double z, double rotationX, double rotationY, double rotationZ) : base(x,y,z,rotationX,rotationY,rotationZ) {
             this.type = "robot";
             this.Position = "07";
+            this.guid = Guid.NewGuid();
         }
         
-        public Robot(int ID) : base(ID)
+        public Robot()
         {
+            this.guid = Guid.NewGuid();
             this.type = "robot";
             this.Position = "07";
 
@@ -32,7 +34,7 @@ namespace Models {
 
         public void MoveOverPath(Node[] path)
         {
-            if ((this.x >= 68 && this.x < 70) && this.z >= 0 && this.z < 110)
+            if ((this.x >= 100 && this.x < 104) && this.z >= 0 && this.z < 110)
                 World.Doors.Open();
             else
                 World.Doors.Close();

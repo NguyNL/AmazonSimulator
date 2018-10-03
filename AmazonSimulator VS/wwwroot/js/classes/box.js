@@ -1,11 +1,11 @@
-var instanceRack = false;
-var firstLoadRack = true;
+var instanceBox = false;
+var firstLoadBox = true;
 
-class Rack extends THREE.Group {
-    constructor(obj = false) {
+class Box extends THREE.Group {
+
+    constructor() {
         super();
-
-        this._obj = obj;
+        
         this._loadState = LoadStates.NOT_LOADING;
         this.init();
     }
@@ -18,24 +18,24 @@ class Rack extends THREE.Group {
 
         this._loadState = LoadStates.LOADING;
 
-        if (!firstLoadRack) {
+        if (!firstLoadBox) {
             var selfRef = this;
 
-            var checkExistInstanceRack = setInterval(function () {
-                if (instanceRack) {
-                    this.clearInterval(checkExistInstanceRack);
+            var checkExistInstance = setInterval(function () {
+                if (instanceBox) {
+                    this.clearInterval(checkExistInstance);
 
-                    var clone = instanceRack.clone();
+                    var clone = instanceBox.clone();
                     clone.position.set(0, 0, 0);
                     selfRef.add(clone);
                 }
             }, 100);
         }
         else {
-            firstLoadRobot = false;
+            firstLoadBox = false;
             var selfRef = this;
-            Loading.OBJModel('obj/storage_rack/', 'rackpoly.obj', 'obj/storage_rack/', 'rackpoly.mtl', (mesh) => {
-                instanceRack = mesh;
+            Loading.OBJModel('obj/cardboard_box/', 'cardboard_box.obj', 'obj/cardboard_box/', 'cardboard_box.mtl', (mesh) => {
+                instanceBox = mesh;
                 selfRef.add(mesh);
                 selfRef._loadState = LoadStates.LOADED;
             });

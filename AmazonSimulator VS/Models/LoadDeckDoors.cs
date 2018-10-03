@@ -12,21 +12,23 @@ namespace Models
 
         private bool NeedUpdate { get; set; }
         private double OpenPositionX { get; set; }
+        private double ClosePositionX { get; set; }
 
         private double DoorAnimationStep { get; set; }
 
 
-        public LoadDeckDoors(int ID) : base(ID)
+        public LoadDeckDoors()
         {
+            this.guid = Guid.NewGuid();
             this.OpeningProgress = false;
             this.ClosingProgress = false;
 
             this.type = "doors";
             this.NeedUpdate = false;
 
-            this.OpenPositionX = 9.25;
-
-            this.x = 7.95;
+            this.OpenPositionX = 11.156;//9.25;
+            this.ClosePositionX = 9.856;//7.95; //9.856; 1.906
+            this.x = ClosePositionX; 
             this.y = 7;
             this.z = -1.67;
 
@@ -67,7 +69,7 @@ namespace Models
 
             if (ClosingProgress)
             {
-                if (7.95 >= x)
+                if (ClosePositionX >= x)
                     ClosingProgress = false;
                 else
                 {

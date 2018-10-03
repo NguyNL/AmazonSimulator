@@ -8,19 +8,26 @@ namespace Models
     public class Rack : Mesh, IUpdatable
     {
         private List<RackTask> Tasks = new List<RackTask>();
+        public List<Box> Boxes = new List<Box>();
         private double Speed = 1;
         public string Position { get; private set; }
         private bool InRotationAnimation = false;
         private bool FirstMovement = true;
 
-        public Rack(double x, double y, double z, double rotationX, double rotationY, double rotationZ, int ID) : base(x, y, z, rotationX, rotationY, rotationZ, ID)
+        public Rack(double x, double y, double z, double rotationX, double rotationY, double rotationZ) : base(x, y, z, rotationX, rotationY, rotationZ)
         {
+            this.guid = Guid.NewGuid();
             this.type = "rack";
             this.Position = "07";
+
+            this.rotationX = 180 * Math.PI / 180;
+
+            FillRack();
         }
 
-        public Rack(int ID) : base(ID)
+        public Rack()
         {
+            this.guid = Guid.NewGuid();
             this.type = "rack";
             this.Position = "07";
 
@@ -31,8 +38,84 @@ namespace Models
             this.rotationX = 180 * Math.PI / 180;
             this.rotationY = -90 * Math.PI / 180;
             this.rotationZ = 0;
+
+            FillRack();
         }
 
+        private void FillRack()
+        {
+            // RACKS & BOXES
+            // Rack Floors Y positions  floor:[1,2,3,4]
+            double[] floorY = { -0.86, -0.3035, 0.2552, 0.8058 };
+
+            // startpoint, endpoint, currentpoint
+            double[] cordX = { -0.3, 0.3, -0.3 };
+            double[] cordZ = { 0.3, -0.38, 0.3 };
+
+            // Small [size, scale], medium [size,scale], big[size, scale]
+            double[] boxSizes = { 0.25, 0.25, 0.32 };
+            double[,] boxSizeScale = {
+                {0.01, 0.01, 0.01},
+                {0.01, 0.015, 0.01},
+                {0.013, 0.01, 0.013}
+            };
+
+            Random rnd = new Random();
+
+            // Fill floors on a rack
+            for (var i = 0; i < floorY.Length; i++)
+            {
+                cordZ[2] = cordZ[0];
+                cordX[2] = cordX[0];
+
+                // Max 9 Cardboard boxes
+                for (var j = 0; j < 9; j++)
+                {
+                    int boxIndex = rnd.Next(0,3);
+
+                    if (boxIndex == 2)
+                    {
+                        cordX[2] += 0.04;
+                        cordZ[2] -= 0.02;
+                    }
+
+                    if (cordX[2] > cordX[1])
+                    {
+                        if ((cordZ[2] - boxSizes[boxIndex]) < cordZ[1]) break;
+
+                        cordZ[2] -= boxSizes[boxIndex];
+                        cordX[2] = cordX[0];
+
+                        if (boxIndex == 2)
+                        {
+                            cordX[2] += 0.04;
+                            cordZ[2] -= 0.02;
+                        }
+                    }
+
+                    var newBox = new Box(cordX[2], floorY[i], cordZ[2], rnd.Next(0, 50) / 1000, 0, 0, boxSizeScale[boxIndex,0], boxSizeScale[boxIndex, 1], boxSizeScale[boxIndex, 2], this.guid);
+                    
+                    //newBox.position.y = floorY[i];
+                    //newBox.position.x = cordX[2];
+                    //newBox.position.z = cordZ[2];
+
+                    //newBox.rotation.y = Math.round(Math.random() * 50) / 1000;
+
+                    //newBox.scale.set(boxSizes[boxIndex][1][0], boxSizes[boxIndex][1][1], boxSizes[boxIndex][1][2]);
+
+                    cordX[2] += boxSizes[boxIndex];
+
+                    if (boxIndex == 2)
+                    {
+                        cordZ[2] -= 0.06;
+                    }
+
+                    Boxes.Add(newBox);
+                    //rack.add(newobject);
+                    //boxes.push(newobject);
+                }
+            }
+        }
 
         public void MoveOverPath(Node[] path)
         {
@@ -125,6 +208,9 @@ namespace Models
 
         public override bool Update(int tick)
         {
+            //foreach (Box box in Boxes)
+            //    box.Update(tick);
+
             if (Tasks.Count > 0)
             {
                 if (Tasks.First().TaskComplete(this))

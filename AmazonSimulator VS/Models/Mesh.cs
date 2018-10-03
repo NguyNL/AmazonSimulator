@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 namespace Models
 {
     public class Mesh : IUpdatable {
-        private int _ID;
-
         private double _x = 0;
         private double _y = 0;
         private double _z = 0;
         private double _rX = 0;
         private double _rY = 0;
         private double _rZ = 0;
+        private double _sX = 0;
+        private double _sY = 0;
+        private double _sZ = 0;
 
-        public int ID { get { return _ID; } protected set { _ID = value; } }
         public string type { get; protected set; }
         public Guid guid { get; protected set; }
         public double x { get { return _x; } protected set { _x = value; } }
@@ -25,14 +25,14 @@ namespace Models
         public double rotationX { get { return _rX; } protected set { _rX = value; } }
         public double rotationY { get { return _rY; } protected set { _rY = value; } }
         public double rotationZ { get { return _rZ; } protected set { _rZ = value; } }
+        public double scaleX { get { return _sX; } protected set { _sX = value; } }
+        public double scaleY { get { return _sY; } protected set { _sY = value; } }
+        public double scaleZ { get { return _sZ; } protected set { _sZ = value; } }
 
         public bool needsUpdate = true;
 
-        public Mesh(double x, double y, double z, double rotationX, double rotationY, double rotationZ, int ID)
+        public Mesh(double x, double y, double z, double rotationX, double rotationY, double rotationZ)
         {
-            this.guid = Guid.NewGuid();
-            this._ID = ID;
-
             this._x = x;
             this._y = y;
             this._z = z;
@@ -42,9 +42,24 @@ namespace Models
             this._rZ = rotationZ;
         }
 
-        public Mesh(int ID)
+        public Mesh(double x, double y, double z, double rotationX, double rotationY, double rotationZ, double scaleX, double scaleY, double scaleZ)
         {
-            this._ID = ID;
+            this._x = x;
+            this._y = y;
+            this._z = z;
+
+            this._rX = rotationX;
+            this._rY = rotationY;
+            this._rZ = rotationZ;
+
+            this._sX = scaleX;
+            this._sY = scaleY;
+            this._sZ = scaleZ;
+        }
+
+        public Mesh()
+        {
+            
         }
 
         public virtual void Move(double x, double y, double z)

@@ -32,10 +32,6 @@ window.onload = function () {
         textMap = 'ely_hills',
         textName = 'hills',
 
-        // Loaddock door open or not
-        doorIsOpen = false, // open = TRUE
-        doorOpenAnimation,
-
         // Crane variables
         boatLoadXPosition = -4,
         boatX = 2.15,
@@ -92,7 +88,7 @@ window.onload = function () {
     var warehouseGrid = new THREE.Group();
     warehouseGrid.rotation.y = 90 * Math.PI / 180;
     warehouseGrid.position.x = 3.8;
-    warehouseGrid.position.z = 30;
+    warehouseGrid.position.z = 32;
     warehouse.add(warehouseGrid);
 
     // Robot
@@ -117,84 +113,14 @@ window.onload = function () {
     doorRight.position.y = 7;
     doorLeft.position.y = 7;
 
-    doorRight.position.x = 7.95;
-    doorLeft.position.x = 7.95;
+    doorRight.position.x = 9.856;
+    doorLeft.position.x = 9.856;
 
     doorRight.scale.set(12, 12, 12);
     doorLeft.scale.set(12, 12, 12);
 
     warehouseGrid.add(doorLeft);
     warehouseGrid.add(doorRight);
-
-    function makeFilledRack(onload) {
-        var rack = new THREE.Group();
-
-        // startpoint, endpoint, currentpoint
-        var cordX = [-0.28, 0.3, -0.3];
-        var cordZ = [0.3, -0.3, 0.3];
-
-        if (rackObj) {
-            var copyrack = rackObj.copy();
-            rack.add(copyrack);
-            racks.push(copyrack);
-        } else {
-            Loading.OBJModel('obj/cardboard_box/', 'cardboard_box.obj', 'obj/cardboard_box/', 'cardboard_box.mtl', (mesh) => {
-                // Fill floors on a rack
-                for (var i = 0; i < floorY.length; i++) {
-                    cordZ[2] = cordZ[0];
-                    cordX[2] = cordX[0];
-
-                    // Max 9 Cardboard boxes
-                    for (var j = 0; j < 9; j++) {
-                        boxIndex = Math.round(Math.random() * 2);
-
-                        if (boxIndex === 2) {
-                            cordX[2] += 0.04;
-                            cordZ[2] -= 0.02;
-                        }
-
-                        if (cordX[2] > cordX[1]) {
-                            if ((cordZ[2] - boxSizes[boxIndex][0]) < cordZ[1]) break;
-
-                            cordZ[2] -= boxSizes[boxIndex][0];
-                            cordX[2] = cordX[0];
-
-                            if (boxIndex === 2) {
-                                cordX[2] += 0.04;
-                                cordZ[2] -= 0.02;
-                            }
-                        }
-
-                        var newobject = mesh.clone();
-                        newobject.position.y = floorY[i];
-                        newobject.position.x = cordX[2];
-                        newobject.position.z = cordZ[2];
-
-                        newobject.rotation.y = Math.round(Math.random() * 50) / 1000;
-
-                        newobject.scale.set(boxSizes[boxIndex][1][0], boxSizes[boxIndex][1][1], boxSizes[boxIndex][1][2]);
-
-                        cordX[2] += boxSizes[boxIndex][0];
-
-
-                        if (boxIndex === 2) {
-                            cordZ[2] -= 0.06;
-                        }
-
-                        rack.add(newobject);
-                        boxes.push(newobject);
-                    }
-                }
-            });
-
-            Loading.OBJModel('obj/storage_rack/', 'rackpoly.obj', 'obj/storage_rack/', 'rackpoly.mtl', (mesh) => {
-                rackObj = mesh;
-                rack.add(mesh);
-            });
-        }
-
-        onload(rack);
-    }
 
     function init() {
         /**
@@ -272,44 +198,6 @@ window.onload = function () {
         scene.add(light);
 
         THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
-
-        //robot = new Robot();
-        //robot.position.x = 51; // 17
-        //robot.position.y = 0;
-        //robot.position.z = 120; // 0
-
-        ////robot.rotation.y = 90 * Math.PI / 180;
-        //robotsGroup.add(robot);
-
-        /**
-         ** RACK FILLING
-         ** --- --- --- X9 (Break between each 3 racks)
-         ** --- --- ---
-         ** --- --- --- TOTAL 36 RACKS
-         ** --- --- ---
-         ** X4 rows   */
-
-        //rackPerRow = 9;
-        //rowBreak = 0;
-        //for (var i = 0; i < 18; i++)
-        //    makeFilledRack((rack) => {
-        //        rack.position.x = ((Math.floor(i % rackPerRow) * 1) + (rowBreak * 1));
-        //        rack.position.y = 0.96;
-        //        rack.position.z = (Math.floor(i / rackPerRow) * 2.5)+6;
-                
-
-        //        if (i % 3 == 2) rowBreak++;
-        //        if (i % 3 == 2 && rowBreak == 3) rowBreak = 0;
-
-        //        racks.push(rack);
-        //        warehouseGrid.add(rack);
-
-        //        rack.name = 'rack' + i;
-        //        rack.cursor = "pointer";
-        //        rack.on('click', function (ev) {
-        //            console.log('%c' + rack.name + '%c => pointerdown', 'color: #fff; background: #41b882; padding: 3px 4px;', 'color: #41b882; background: #fff;');
-        //        });
-        // });
 
         function unloadLoadingDeck() {
             switch (loadDeckIsLoadedWith) {
@@ -742,72 +630,71 @@ window.onload = function () {
         cameraControls.update();
         renderer.render(scene, camera);
     }
-
-    robots = {};
-    racks = {};
+    
     exampleSocket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/connect_client");
     exampleSocket.onmessage = function (event) {
         var command = parseCommand(event.data);
 
         if (command.command === "update") {
-            if (Object.keys(worldObjects).indexOf(command.parameters.guid) < 0) {
-                //console.log(command.parameters);
-                if (command.parameters.type === "robot") {
+            if (command.parameters.type === "robot") {
+                var robot;
 
-                    var robot;
+                if (Object.keys(worldObjects).indexOf(command.parameters.guid) < 0) {
+                    robot = new Robot();
+                    
+                    worldObjects[command.parameters.guid] = robot;
+                    robotsGroup.add(robot);
+                } else {
+                    robot = worldObjects[command.parameters.guid];
+                }
+                    
+                robot.position.x = command.parameters.x;
+                robot.position.y = command.parameters.y;
+                robot.position.z = command.parameters.z;
+                robot.rotation.y = command.parameters.rotationY;
+            }
 
-                    if (!(command.parameters.ID in robots)) {
+            if (command.parameters.type === "rack") {
+
+                var rack;
+
+                if (Object.keys(worldObjects).indexOf(command.parameters.guid) < 0) {
+                    rack = new Rack();
+
+                    worldObjects[command.parameters.guid] = rack;
+                    racksGroup.add(rack);
+
+                    command.parameters.Boxes.forEach(function (boxInfo) {
+                        var box;
                         
-                        if (robotsGroup.children.length > 0)
-                            robot = new Robot(robotsGroup.children[0]);
-                        else
-                            robot = new Robot();
+                        box = new Box();
 
-                        robots[command.parameters.ID] = robot;
-                        robotsGroup.add(robot);
-                    } else {
-                        robot = robots[command.parameters.ID];
-                    }
-                   
+                        box.position.set(boxInfo.x, boxInfo.y, boxInfo.z);
+                        box.rotation.set(boxInfo.rotationX, boxInfo.rotationY, boxInfo.rotationZ);
+                        box.scale.set(boxInfo.scaleX, boxInfo.scaleY, boxInfo.scaleZ);
+
+                        worldObjects[boxInfo.guid] = box;
+                        rack.add(box);
+                        boxes.push(box);
+                    });
+
+                } else {
+                    rack = worldObjects[command.parameters.guid];
+                }
+                
+                rack.scale.set(25, 25, 25);
+                rack.position.x = command.parameters.x;
+                rack.position.y = command.parameters.y;
+                rack.position.z = command.parameters.z;
+                rack.rotation.x = command.parameters.rotationX;
+                rack.rotation.y = command.parameters.rotationY;
+            }
+
+            if (command.parameters.type === "doors") {
+                var difference = command.parameters.x - doorRight.position.x;
                     
-                    robot.position.x = command.parameters.x;
-                    robot.position.y = command.parameters.y;
-                    robot.position.z = command.parameters.z;
-                    robot.rotation.y = command.parameters.rotationY;
-                }
-
-                if (command.parameters.type === "rack") {
-
-                    var rack;
-
-                    if (!(command.parameters.ID in racks)) {
-
-                        if (racksGroup.children.length > 0)
-                            rack = new Rack(racksGroup.children[0]);
-                        else
-                            rack = new Rack();
-
-                        racks[command.parameters.ID] = rack;
-                        racksGroup.add(rack);
-
-                    } else {
-                        rack = racks[command.parameters.ID];
-                    }
-
-                    rack.scale.set(25, 25, 25);
-                    rack.position.x = command.parameters.x;
-                    rack.position.y = command.parameters.y;
-                    rack.position.z = command.parameters.z;
-                    rack.rotation.x = command.parameters.rotationX;
-                    rack.rotation.y = command.parameters.rotationY;
-                }
-
-                if (command.parameters.type === "doors") {
-                    var difference = command.parameters.x - doorRight.position.x;
-                    
-                    doorRight.position.x += difference;
-                    doorLeft.position.x -= difference;
-                }
+                doorRight.position.x += difference;
+                doorLeft.position.x -= difference;
             }
         }
     }
