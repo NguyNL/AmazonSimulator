@@ -14,20 +14,6 @@ window.onload = function () {
     var camera, scene, renderer, cameraControls,
         worldObjects = {},
 
-        // RACKS & BOXES
-        // Rack Floors Y positions  floor:[1,2,3,4]
-        floorY = [-0.83, -0.2735, 0.2852, 0.8358],
-
-        // Small [size, scale], medium [size,scale], big[size, scale]
-        boxSizes = [
-            [0.25, [0.01, 0.01, 0.01]],
-            [0.25, [0.01, 0.015, 0.01]],
-            [0.32, [0.013, 0.01, 0.013]]
-        ],
-
-        racks = [],
-        rackObj, cardboardBoxObj, platform,
-
         // Skybox Map & Name
         textMap = 'ely_hills',
         textName = 'hills',
