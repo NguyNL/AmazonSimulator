@@ -570,7 +570,7 @@ window.onload = function () {
         /**
          ** PLATFORM(WORLD) LOADING
          **/
-        Loading.OBJModel('obj/platform/', 'bigger_platform.obj', 'obj/platform/', 'bigger_platform.mtl', (mesh) => {
+        Loading.OBJModel('obj/platform/', 'loading_platform.obj', 'obj/platform/', 'loading_platform.mtl', (mesh) => {
             mesh.scale.set(20, 20, 20);
 
             mesh.position.y = 0;
@@ -585,6 +585,16 @@ window.onload = function () {
 
             platformGroup.add(mesh);
             platform = mesh;
+        });
+
+        Loading.OBJModel('obj/platform/', 'platform_detail.obj', 'obj/platform/', 'platform_detail.mtl', (mesh) => {
+            mesh.scale.set(20, 20, 20);
+
+            mesh.position.y = 0;
+            mesh.position.z = 0;
+            mesh.position.x = 0;
+
+            platformGroup.add(mesh);
         });
 
         /**
