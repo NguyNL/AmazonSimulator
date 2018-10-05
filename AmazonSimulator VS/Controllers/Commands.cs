@@ -32,7 +32,7 @@ namespace Controllers {
 
     public class UpdateModel3DCommand : Model3DCommand {
         
-        public UpdateModel3DCommand(Object parameters) : base("update", parameters) {
+        public UpdateModel3DCommand(Object parameters, string action) : base(action, parameters) {
         }
     }
 }

@@ -11,12 +11,13 @@ namespace Models
         private double CurrentSpeed = 0.03;
         private bool MovingToCrane = false;
         private bool MovingAwayFromCrane = false;
-        public string Position { get; private set; }
+        public int NumberOfRacksLoaded = 4;
+        public Transport Position { get; private set; }
 
         public Boat(double x, double y, double z, double rotationX, double rotationY, double rotationZ) : base(x, y, z, rotationX, rotationY, rotationZ)
         {
             this.type = "boat";
-            this.Position = "07";
+            this.Position = Transport.created;
             this.guid = Guid.NewGuid();
         }
 
@@ -24,7 +25,7 @@ namespace Models
         {
             this.guid = Guid.NewGuid();
             this.type = "boat";
-            this.Position = "07";
+            this.Position = Transport.created;
 
             this.x = 0;
             this.y = 0;
@@ -93,6 +94,7 @@ namespace Models
         {
             MoveToLoadStation();
             MoveAwayFromLoadStation();
+
             if (needsUpdate)
             {
                 needsUpdate = false;

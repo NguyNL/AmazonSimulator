@@ -11,20 +11,21 @@ namespace Models
         private double CurrentSpeed = 0.08;
         private bool MovingToCrane = false;
         private bool MovingAwayFromCrane = false;
-        public string Position { get; private set; }
+        public int NumberOfRacksLoaded = 4;
+        public Transport Position { get; private set; }
 
         public Truck(double x, double y, double z, double rotationX, double rotationY, double rotationZ) : base(x, y, z, rotationX, rotationY, rotationZ)
         {
             this.type = "truck";
-            this.Position = "07";
             this.guid = Guid.NewGuid();
+            this.Position = Transport.created;
         }
 
         public Truck()
         {
             this.guid = Guid.NewGuid();
             this.type = "truck";
-            this.Position = "07";
+            this.Position = Transport.created;
 
             this.x = 0;
             this.y = 0;
@@ -42,6 +43,9 @@ namespace Models
         {
             if (MovingToCrane && !MovingAwayFromCrane)
             {
+                if (this.Position != Transport.toLoadingDeck)
+                    this.Position = Transport.toLoadingDeck;
+
                 if (this.z > 3.5)
                 {
                     this.z -= CurrentSpeed;
@@ -58,6 +62,10 @@ namespace Models
                     {
                         this.z = 0;
                         MovingToCrane = false;
+
+                        if (this.Position != Transport.loadingDeck)
+                            this.Position = Transport.loadingDeck;
+
                         this.MoveAwayFromCrane();
                     }
                     else
@@ -72,6 +80,9 @@ namespace Models
         {
             if(MovingAwayFromCrane && !MovingToCrane)
             {
+                if (this.Position != Transport.fromLoadingDeck)
+                    this.Position = Transport.fromLoadingDeck;
+
                 CurrentSpeed += 0.0005;
                 if (CurrentSpeed > MaxSpeed)
                     CurrentSpeed = MaxSpeed;

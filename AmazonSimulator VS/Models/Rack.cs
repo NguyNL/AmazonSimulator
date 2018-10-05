@@ -29,11 +29,11 @@ namespace Models
         {
             this.guid = Guid.NewGuid();
             this.type = "rack";
-            this.Position = "07";
+            this.Position = Manager.StartPoint;
 
-            this.x = 119;
-            this.y = 0;
-            this.z = 0;
+            this.x = Manager.StartPointNode.x;
+            this.y = Manager.StartPointNode.y;
+            this.z = Manager.StartPointNode.z;
 
             this.rotationX = 180 * Math.PI / 180;
             this.rotationY = 90 * Math.PI / 180;

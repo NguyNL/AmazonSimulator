@@ -5,13 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="wwwroot\js\NewFolder\**" />
-    <Content Remove="wwwroot\js\NewFolder\**" />
-    <EmbeddedResource Remove="wwwroot\js\NewFolder\**" />
-    <None Remove="wwwroot\js\NewFolder\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Include="Models\Node.cs" />
   </ItemGroup>
 

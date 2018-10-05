@@ -10,28 +10,24 @@ using Microsoft.EntityFrameworkCore.Internal;
 namespace Models {
     public class World : IObservable<Command>, IUpdatable
     {
-        private List<Object> worldObjects = new List<Object>();
+        private List<Mesh> worldObjects = new List<Mesh>();
         private List<IObserver<Command>> observers = new List<IObserver<Command>>();
-        private Dictionary<string, Node> Map = new Dictionary<string, Node>();
-        private Dictionary<int, string> RackPositions = new Dictionary<int, string>();
-        private Dictionary<int, string> RobotPositions = new Dictionary<int, string>();
-        static public LoadDeckDoors Doors;
-        private Graph g { get; set; }
-        private List<Robot> allRobots = new List<Robot>();
-        private List<Rack> allRacks = new List<Rack>();
-        //private List<Node> nodeList = new List<Node>();
 
+        private Graph g { get; set; }
+        private Manager manager;
 
         public World() {
-            Doors = CreateDoors();
-            Boat boat = CreateBoat();
-            boat.MoveToCrane();
-            Truck truck = CreateTruck();
-            truck.MoveToCrane();
-            Path();
+            manager = new Manager(
+                CreateTruck(), 
+                CreateBoat()
+            );
+
+            Manager.Doors = CreateDoors();
+
+            LoadGridMap();
         }
 
-        private void Path()
+        private void LoadGridMap()
         {
             g = new Graph();
             int stepX = 25;
@@ -61,7 +57,7 @@ namespace Models {
                     Dictionary<string, Node> vertexDictonary = new Dictionary<string, Node>();
 
                     // Add the position to the map
-                    Map.Add(key, new Node {
+                    manager.Map.Add(key, new Node {
                         x = column * stepX,
                         y = 0,
                         z = row * stepZ
@@ -83,19 +79,14 @@ namespace Models {
                                 });
 
                             // Add begin point
-                            vertexDictonary.Add("07", new Node
-                            {
-                                x = 7 * stepX,
-                                y = 0,
-                                z = 0
-                            });
+                            vertexDictonary.Add(Manager.StartPoint, Manager.StartPointNode);
 
                             needsPoint = true;
                         }
                         else
                             if (row % 2 == breaksAfterLoadDeck % 2)
                             {
-                                // Add begin point
+                                // Add behind doors point
                                 vertexDictonary.Add("04", new Node
                                 {
                                     x = 4 * stepX,
@@ -129,9 +120,9 @@ namespace Models {
                     } else
                     {
                         // StartPoint
-                        if (row == 0 && column == 7)
+                        if (row == Manager.StartPointCoord[0] && column == Manager.StartPointCoord[1])
                         {
-                            // Add starting point
+                            // Add behind doors point tot the begin point
                             vertexDictonary.Add("04", new Node
                             {
                                 x = 4 * stepX,
@@ -157,7 +148,12 @@ namespace Models {
                                 });
 
                                 // Add new rack position
-                                RackPositions.Add(rackPlaceIndex, key);
+                                manager.RackPlaces.Add(
+                                    rackPlaceIndex,
+                                    new RackPlace {
+                                        HasRackOnIt = false,
+                                        Coord = key
+                                    });
 
                                 // rack index up
                                 rackPlaceIndex++;
@@ -224,13 +220,16 @@ namespace Models {
                 }
             }
 
+
+            manager.Start();
+
             //Thread t = new Thread(new ThreadStart(startFilling));
             //t.Start();
         }
 
         public void startFilling()
         {
-            foreach (KeyValuePair<int, string> coord in RackPositions)
+            foreach (KeyValuePair<int, RackPlace> coord in manager.RackPlaces)
             {
                 Robot r = CreateRobot();
                 Rack ra = CreateRack();
@@ -238,20 +237,25 @@ namespace Models {
                 worldObjects.Add(r);
                 worldObjects.Add(ra);
 
-                r.Move(g.shortest_path(r.Position, coord.Value), coord.Value);
-                ra.Move(g.shortest_path(ra.Position, coord.Value), coord.Value);
+                r.Move(g.shortest_path(r.Position, coord.Value.Coord), coord.Value.Coord);
+                ra.Move(g.shortest_path(ra.Position, coord.Value.Coord), coord.Value.Coord);
+
+                if (coord.Key == 2)
+                    break;
 
                 Thread.Sleep(10000);
             }
 
-            allRobots[0].Move(g.shortest_path(allRobots[0].Position, "07"), "07");
-            allRacks[0].Move(g.shortest_path(allRacks[0].Position, "07"), "07");
+            manager.AllRobots[0].Move(g.shortest_path(manager.AllRobots[0].Position, "07"), "07");
+            manager.AllRacks[0].Move(g.shortest_path(manager.AllRacks[0].Position, "07"), "07");
+
+            manager.AllRobots[1].Delete();
         }
 
         private Robot CreateRobot(double x, double y, double z) {
             Robot robot = new Robot(x,y,z,0,0,0);
             worldObjects.Add(robot);
-            allRobots.Add(robot);
+            manager.AllRobots.Add(robot);
             return robot;
         }
 
@@ -259,7 +263,7 @@ namespace Models {
         {
             Robot robot = new Robot();
             worldObjects.Add(robot);
-            allRobots.Add(robot);
+            manager.AllRobots.Add(robot);
             return robot;
         }
 
@@ -267,7 +271,7 @@ namespace Models {
         {
             Rack rack = new Rack(x, y, z, 0, 0, 0);
             worldObjects.Add(rack);
-            allRacks.Add(rack);
+            manager.AllRacks.Add(rack);
             return rack;
         }
 
@@ -275,7 +279,7 @@ namespace Models {
         {
             Rack rack = new Rack();
             worldObjects.Add(rack);
-            allRacks.Add(rack);
+            manager.AllRacks.Add(rack);
             return rack;
         }
 
@@ -331,21 +335,27 @@ namespace Models {
         }
 
         private void SendCreationCommandsToObserver(IObserver<Command> obs) {
-            foreach(Object m3d in worldObjects) {
-                obs.OnNext(new UpdateModel3DCommand(m3d));
+            foreach(Mesh m3d in worldObjects) {
+                obs.OnNext(new UpdateModel3DCommand(m3d, m3d.action));
+
+                if (m3d.action == "delete")
+                    worldObjects.Remove(m3d);
             }
         }
 
         public bool Update(int tick)
         {
             for(int i = 0; i < worldObjects.Count; i++) {
-                var u = worldObjects[i];
+                Mesh u = worldObjects[i];
                 
                 if (u is IUpdatable) {
                     bool needsCommand = ((IUpdatable)u).Update(tick);
 
                     if(needsCommand) {
-                        SendCommandToObservers(new UpdateModel3DCommand(u));
+                        SendCommandToObservers(new UpdateModel3DCommand(u, u.action));
+
+                        if (u.action == "delete")
+                            worldObjects.Remove(u);
                     }
                 }
             }

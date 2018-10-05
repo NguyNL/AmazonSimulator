@@ -13,7 +13,7 @@ namespace Models {
 
         public Robot(double x, double y, double z, double rotationX, double rotationY, double rotationZ) : base(x,y,z,rotationX,rotationY,rotationZ) {
             this.type = "robot";
-            this.Position = "07";
+            this.Position = Manager.StartPoint;
             this.guid = Guid.NewGuid();
         }
         
@@ -21,11 +21,11 @@ namespace Models {
         {
             this.guid = Guid.NewGuid();
             this.type = "robot";
-            this.Position = "07";
+            this.Position = Manager.StartPoint;
 
-            this.x =  119;
-            this.y =    0;
-            this.z =    0;
+            this.x = Manager.StartPointNode.x;
+            this.y = Manager.StartPointNode.y;
+            this.z = Manager.StartPointNode.z;
 
             this.rotationX = 0;
             this.rotationY = -90 * Math.PI / 180;
@@ -35,9 +35,9 @@ namespace Models {
         public void MoveOverPath(Node[] path)
         {
             if ((this.x >= 100 && this.x < 104) && this.z >= 0 && this.z < 110)
-                World.Doors.Open();
+                Manager.Doors.Open();
             else
-                World.Doors.Close();
+                Manager.Doors.Close();
 
             if (FirstMovement)
                 CheckRotationPosition(path[0]);
@@ -84,7 +84,7 @@ namespace Models {
                 RotateObject(180);
         }
 
-        public void RotateObject(int degrees)
+        private void RotateObject(int degrees)
         {
             int currentDegrees = (int)(this.rotationY / Math.PI * 180);
 
@@ -125,9 +125,24 @@ namespace Models {
             this.Position = position;
         }
 
+        public void Delete() {
+            this.action = "delete";
+        }
+
+        private void Clear()
+        {
+            Tasks.Clear();
+        }
 
         public override bool Update(int tick)
         {
+            if (this.action == "delete")
+            {
+                Clear();
+                return true;
+            }
+                
+
             if (Tasks.Count > 0)
             {
                 if (Tasks.First().TaskComplete(this))
@@ -138,6 +153,8 @@ namespace Models {
 
                 return true;
             }
+
+           
 
             return false;
         }

@@ -17,6 +17,8 @@ namespace Models
         private double _sY = 0;
         private double _sZ = 0;
 
+        private string _action = "update";
+
         public string type { get; protected set; }
         public Guid guid { get; protected set; }
         public double x { get { return _x; } protected set { _x = value; } }
@@ -30,6 +32,7 @@ namespace Models
         public double scaleZ { get { return _sZ; } protected set { _sZ = value; } }
 
         public bool needsUpdate = true;
+        public string action { get { return _action; } protected set { _action = value; } }
 
         public Mesh(double x, double y, double z, double rotationX, double rotationY, double rotationZ)
         {

@@ -1,7 +1,3 @@
-function parseCommand(input = "") {
-    return JSON.parse(input);
-}
-
 var exampleSocket;
 var boxes = [];
 window.onload = function () {
@@ -639,6 +635,21 @@ window.onload = function () {
     exampleSocket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/connect_client");
     exampleSocket.onmessage = function (event) {
         var command = parseCommand(event.data);
+        
+        if (command.command === "delete") {
+            console.log("delete");
+            if (!(Object.keys(worldObjects).indexOf(command.parameters.guid) < 0)) {
+                var object = worldObjects[command.parameters.guid];
+                
+                switch (command.parameters.type) {
+                    case "robot":
+                        robotsGroup.remove(object);
+                        break;
+                }
+
+                delete worldObjects[command.parameters.guid];
+            }
+        }
 
         if (command.command === "update") {
             if (command.parameters.type === "robot") {
@@ -706,6 +717,11 @@ window.onload = function () {
                 } else {
                     truck = worldObjects[command.parameters.guid];
                 }
+                
+                if (truck.position.z < 2 && truck.position.z >= 0.0005)
+                    truck.breakLights();
+                else
+                    truck.normalLights();
 
                 truck.position.x = command.parameters.x;
                 truck.position.y = command.parameters.y;
@@ -727,7 +743,6 @@ window.onload = function () {
                 boat.position.x = command.parameters.x;
                 boat.position.y = command.parameters.y;
                 boat.position.z = command.parameters.z;
-                console.log(boat.position.z);
             }
 
             if (command.parameters.type === "doors") {
