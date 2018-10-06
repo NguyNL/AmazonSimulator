@@ -8,12 +8,14 @@ namespace Models {
         private List<RobotTask> Tasks = new List<RobotTask>();
         private double Speed = 1;
         public string Position { get; private set; }
+        public string CurrentPos { get; private set; }
         private bool InRotationAnimation = false;
         private bool FirstMovement = true;
 
         public Robot(double x, double y, double z, double rotationX, double rotationY, double rotationZ) : base(x,y,z,rotationX,rotationY,rotationZ) {
             this.type = "robot";
             this.Position = Manager.StartPoint;
+            this.CurrentPos = Manager.StartPoint;
             this.guid = Guid.NewGuid();
         }
         
@@ -22,6 +24,7 @@ namespace Models {
             this.guid = Guid.NewGuid();
             this.type = "robot";
             this.Position = Manager.StartPoint;
+            this.CurrentPos = Manager.StartPoint;
 
             this.x = Manager.StartPointNode.x;
             this.y = Manager.StartPointNode.y;
@@ -44,17 +47,53 @@ namespace Models {
 
             if(!InRotationAnimation)
             {
-                this.z = path.First().x == this.x ?
-                    path.First().z > this.z ?
-                    this.z += Speed :
-                    this.z -= Speed :
-                    this.z;
+                bool AllowedToMove = true;
+                int CurrentRow = (int)Math.Floor(this.z / 25);
+                int CurrentColumn = (int)Math.Floor(this.x / 25);
 
-                this.x = path.First().z == this.z ?
-                    path.First().x > this.x ?
-                    this.x += Speed :
-                    this.x -= Speed :
-                    this.x;
+                if ((CurrentRow.ToString() + CurrentColumn.ToString()) != CurrentPos)
+                {
+                    CurrentPos = CurrentRow.ToString() + CurrentColumn.ToString();
+                }
+
+                List<Robot> RobotList = Manager.AllRobots
+                    .Where(
+                        robot => robot.CurrentPos == this.CurrentPos
+                    ).ToList();
+
+                if (RobotList.Count > 0)
+                    if (RobotList[0].guid != this.guid)
+                        AllowedToMove = false;
+
+                if (AllowedToMove)
+                {
+                    int NextRow = path.First().x == this.x ? path.First().z > this.z ? CurrentRow - 1 : CurrentRow + 1 : CurrentRow;
+                    int NextColumn = path.First().z == this.z ? path.First().x > this.x ? CurrentColumn + 1 : CurrentColumn - 1 : CurrentColumn;
+
+                    List<Robot> RobotListNextStep = Manager.AllRobots
+                        .Where(
+                            robot => robot.CurrentPos == (NextRow.ToString() + NextColumn.ToString()) &&
+                            robot.guid != this.guid
+                        ).ToList();
+
+                    if (RobotListNextStep.Count > 0)
+                        AllowedToMove = false;
+                }
+
+                if (AllowedToMove)
+                {
+                    this.z = path.First().x == this.x ?
+                        path.First().z > this.z ?
+                        this.z += Speed :
+                        this.z -= Speed :
+                        this.z;
+
+                    this.x = path.First().z == this.z ?
+                        path.First().x > this.x ?
+                        this.x += Speed :
+                        this.x -= Speed :
+                        this.x;
+                }
             }
 
             if (path.First().x == this.x && path.First().z == this.z)

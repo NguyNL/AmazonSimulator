@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Models
@@ -18,38 +19,101 @@ namespace Models
         public static readonly int[] StartPointCoord = { 0 , 7 };
         public static readonly Node StartPointNode = new Node { x = 175, y = 0, z = 0 };
 
-        public List<Robot> AllRobots { get; private set; }
-        public List<Rack> AllRacks { get; private set; }
+        public static List<Robot> AllRobots { get; private set; }
+        public static List<Rack> AllRacks { get; private set; }
 
-        public Truck Truck { get; private set; }
-        public Boat Boat { get; private set; }
+        public Truck _Truck { get; private set; }
+        public Boat _Boat { get; private set; }
+        public Crane _Crane { get; private set; }
+
+        Random _Random = new Random();
 
         private LoadingDeck LoadingDeck { get; set; }
 
-        public Manager(Truck truck, Boat boat)
+        private string Vehicle { get; set; }
+
+        public Graph g { get; set; }
+
+        public Manager(Truck truck, Boat boat, Crane crane)
         {
             this.Map = new Dictionary<string, Node>();
             this.RackPlaces = new Dictionary<int, RackPlace>();
             this.RobotPositions = new Dictionary<int, string>();
 
-            this.AllRobots = new List<Robot>();
-            this.AllRacks = new List<Rack>();
+            AllRobots = new List<Robot>();
+            AllRacks = new List<Rack>();
 
-            this.Truck = truck;
-            this.Boat = boat;
+            this._Truck = truck;
+            this._Boat = boat;
+            this._Crane = crane;
+
+            this.g = new Graph();
 
             this.LoadingDeck = LoadingDeck.free;
         }
 
         public void Start()
         {
-            if(Boat.Position == Transport.created)
-                Boat.MoveToCrane();
+            if(_Boat.Position == Transport.created)
+                _Boat.MoveToCrane();
 
-            if (Truck.Position == Transport.created)
-                Truck.MoveToCrane();
+            if(_Truck.Position == Transport.created)
+                _Truck.MoveToCrane();
 
+            if (_Truck.Position == Transport.loadingDeck)
+            {
+                if(_Crane._CraneState == CraneState.free)
+                    if (this.LoadingDeck == LoadingDeck.free)
+                    {
+                        _Crane.Load("truck", _Truck.guid);
+                        Thread t = new Thread(new ThreadStart(CraneStartLoadingVehicle));
+                        t.Start();
+                    }
+            }
 
+            if (_Boat.Position == Transport.loadingDeck)
+            {
+                _Boat.NumberOfRacksLoaded = _Random.Next(1, 4);
+
+                if (this.LoadingDeck == LoadingDeck.free)
+                    this.LoadingDeck = LoadingDeck.isLoading;
+            }
+
+            if (this.LoadingDeck == LoadingDeck.isLoading && _Crane._CraneState == CraneState.loading)
+            {
+                this.MoveRobots();
+                this.LoadingDeck = LoadingDeck.isUnloading;
+            }
+        }
+
+        private void CraneStartLoadingVehicle()
+        {
+            Thread.Sleep(13000);
+            this.LoadingDeck = LoadingDeck.isLoading;
+        }
+
+        private void MoveRobots()
+        {
+            var places = RackPlaces
+                .Where(x => x.Value.HasRackOnIt == false)
+                .OrderBy(x => _Random.Next()).ToList();
+
+            int amount = _Truck.NumberOfRacksLoaded;
+
+            for(int i = 0; i < amount; i++)
+            {
+                if(AllRobots[i].Position != StartPoint)
+                {
+                    AllRobots[i].Move(g.shortest_path(AllRobots[i].Position, StartPoint), StartPoint);
+                }
+
+                Robot robot = AllRobots[i];
+                Rack rack = World.CreateRack();
+
+                AllRobots[i].Move(g.shortest_path(AllRobots[i].Position, places[i].Value.Coord), places[i].Value.Coord);
+
+                rack.Move(g.shortest_path(rack.Position, places[i].Value.Coord), places[i].Value.Coord);
+            }
         }
     }
 }

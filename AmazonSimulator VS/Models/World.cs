@@ -10,26 +10,32 @@ using Microsoft.EntityFrameworkCore.Internal;
 namespace Models {
     public class World : IObservable<Command>, IUpdatable
     {
-        private List<Mesh> worldObjects = new List<Mesh>();
+        static private List<Mesh> worldObjects = new List<Mesh>();
         private List<IObserver<Command>> observers = new List<IObserver<Command>>();
 
-        private Graph g { get; set; }
-        private Manager manager;
+        private static Manager manager;
 
         public World() {
             manager = new Manager(
                 CreateTruck(), 
-                CreateBoat()
+                CreateBoat(),
+                CreateCrane()
             );
+
+            for(int i = 0; i < 4; i++)
+                CreateRobot();
 
             Manager.Doors = CreateDoors();
 
             LoadGridMap();
+
+            //Manager.AllRobots[0].Move(manager.g.shortest_path(Manager.AllRobots[0].Position, "101"), "101");
+            //Manager.AllRobots[1].Move(manager.g.shortest_path(Manager.AllRobots[1].Position, "102"), "102");
+            //Manager.AllRobots[2].Move(manager.g.shortest_path(Manager.AllRobots[2].Position, "102"), "102");
         }
 
         private void LoadGridMap()
         {
-            g = new Graph();
             int stepX = 25;
             int stepZ = 25;
 
@@ -216,46 +222,42 @@ namespace Models {
                     }
                     
                     if(needsPoint)
-                        g.add_vertex(key, vertexDictonary);
+                        manager.g.add_vertex(key, vertexDictonary);
                 }
             }
-
-
-            manager.Start();
-
             //Thread t = new Thread(new ThreadStart(startFilling));
             //t.Start();
         }
 
-        public void startFilling()
-        {
-            foreach (KeyValuePair<int, RackPlace> coord in manager.RackPlaces)
-            {
-                Robot r = CreateRobot();
-                Rack ra = CreateRack();
+        //public void startFilling()
+        //{
+        //    foreach (KeyValuePair<int, RackPlace> coord in manager.RackPlaces)
+        //    {
+        //        Robot r = CreateRobot();
+        //        Rack ra = CreateRack();
 
-                worldObjects.Add(r);
-                worldObjects.Add(ra);
+        //        worldObjects.Add(r);
+        //        worldObjects.Add(ra);
 
-                r.Move(g.shortest_path(r.Position, coord.Value.Coord), coord.Value.Coord);
-                ra.Move(g.shortest_path(ra.Position, coord.Value.Coord), coord.Value.Coord);
+        //        r.Move(g.shortest_path(r.Position, coord.Value.Coord), coord.Value.Coord);
+        //        ra.Move(g.shortest_path(ra.Position, coord.Value.Coord), coord.Value.Coord);
 
-                if (coord.Key == 2)
-                    break;
+        //        if (coord.Key == 2)
+        //            break;
 
-                Thread.Sleep(10000);
-            }
+        //        Thread.Sleep(10000);
+        //    }
 
-            manager.AllRobots[0].Move(g.shortest_path(manager.AllRobots[0].Position, "07"), "07");
-            manager.AllRacks[0].Move(g.shortest_path(manager.AllRacks[0].Position, "07"), "07");
+        //    manager.AllRobots[0].Move(g.shortest_path(manager.AllRobots[0].Position, "07"), "07");
+        //    manager.AllRacks[0].Move(g.shortest_path(manager.AllRacks[0].Position, "07"), "07");
 
-            manager.AllRobots[1].Delete();
-        }
+        //    manager.AllRobots[1].Delete();
+        //}
 
         private Robot CreateRobot(double x, double y, double z) {
             Robot robot = new Robot(x,y,z,0,0,0);
             worldObjects.Add(robot);
-            manager.AllRobots.Add(robot);
+            Manager.AllRobots.Add(robot);
             return robot;
         }
 
@@ -263,7 +265,7 @@ namespace Models {
         {
             Robot robot = new Robot();
             worldObjects.Add(robot);
-            manager.AllRobots.Add(robot);
+            Manager.AllRobots.Add(robot);
             return robot;
         }
 
@@ -271,15 +273,15 @@ namespace Models {
         {
             Rack rack = new Rack(x, y, z, 0, 0, 0);
             worldObjects.Add(rack);
-            manager.AllRacks.Add(rack);
+            Manager.AllRacks.Add(rack);
             return rack;
         }
 
-        private Rack CreateRack()
+        public static Rack CreateRack()
         {
             Rack rack = new Rack();
             worldObjects.Add(rack);
-            manager.AllRacks.Add(rack);
+            Manager.AllRacks.Add(rack);
             return rack;
         }
 
@@ -309,6 +311,13 @@ namespace Models {
             Boat boat = new Boat();
             worldObjects.Add(boat);
             return boat;
+        }
+
+        private Crane CreateCrane()
+        {
+            Crane crane = new Crane();
+            worldObjects.Add(crane);
+            return crane;
         }
 
         private LoadDeckDoors CreateDoors()
@@ -345,6 +354,14 @@ namespace Models {
 
         public bool Update(int tick)
         {
+            //Force garbage collection.
+            GC.Collect();
+
+            // Wait for all finalizers to complete before continuing.
+            GC.WaitForPendingFinalizers();
+
+            manager.Start();
+
             for(int i = 0; i < worldObjects.Count; i++) {
                 Mesh u = worldObjects[i];
                 

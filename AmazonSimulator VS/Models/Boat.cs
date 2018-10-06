@@ -18,7 +18,9 @@ namespace Models
         private bool MovingAwayFromCrane = false;
         // Integer for the amount of racks loaded.
         public int NumberOfRacksLoaded = 4;
-        // Property for transport position.
+        /// <summary>
+        /// Position of boat.
+        /// </summary>
         public Transport Position { get; private set; }
         #endregion
 

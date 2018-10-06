@@ -27,6 +27,7 @@ class Boat extends THREE.Group {
 
                     var clone = instanceBoat.clone();
                     clone.position.set(0, 0, 0);
+                    clone.name = "boat";
                     selfRef.add(clone);
                 }
             }, 100);
@@ -34,6 +35,7 @@ class Boat extends THREE.Group {
         else {
             firstLoadBoat = false;
             Loading.OBJModel('obj/boat/', 'boat.obj', 'obj/boat/', 'boat.mtl', (mesh) => {
+                mesh.name = "boat";
                 instanceBoat = mesh;
                 selfRef.add(mesh);
                 selfRef._loadState = LoadStates.LOADED;

@@ -11,6 +11,7 @@ namespace Models
         toLoadingDeck,
         loadingDeck,
         fromLoadingDeck,
+        done
     }
 
     public enum LoadingDeck
@@ -18,5 +19,13 @@ namespace Models
         free,
         isLoading,
         isUnloading
+    }
+
+    public enum CraneState
+    {
+        free,
+        loading,
+        unloading,
+        done
     }
 }

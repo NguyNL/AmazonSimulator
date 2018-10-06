@@ -18,7 +18,9 @@ namespace Models
         private bool MovingAwayFromCrane = false;
         // Integer for the amount of racks loaded.
         public int NumberOfRacksLoaded = 4;
-        // Property for transport position.
+        /// <summary>
+        /// Position of truck.
+        /// </summary>
         public Transport Position { get; private set; }
         #endregion
 
@@ -68,9 +70,9 @@ namespace Models
             // Set rotation Z-axis to 0;
             this.rotationZ = 0;
         }
+        #endregion
 
         #region Methods
-
         /// <summary>
         /// Function to set MovingToCrane variable to true.
         /// </summary>
@@ -121,9 +123,6 @@ namespace Models
 
                         if (this.Position != Transport.loadingDeck)
                             this.Position = Transport.loadingDeck;
-
-                        // Start function MoveAwayFromCrane.
-                        this.MoveAwayFromCrane();
                     }
                     else
                         // Set truck's Z position by deducting Z - CurrentSpeed.
@@ -163,8 +162,10 @@ namespace Models
                     this.z = 30;
                     // Set MovingAwayFromCrane to false.
                     MovingAwayFromCrane = false;
-                    // Start function MoveToCrane.
-                    this.MoveToCrane();
+                    // Check if transport is not done.
+                    if (this.Position != Transport.done)
+                        // Set transport to done.
+                        this.Position = Transport.done;
                 }
                 // Set needsUpdate to true.
                 needsUpdate = true;

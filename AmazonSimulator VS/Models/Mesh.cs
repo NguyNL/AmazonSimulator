@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 namespace Models
 {
     public class Mesh : IUpdatable {
+        #region Properties
+        // 
         private double _x = 0;
         private double _y = 0;
         private double _z = 0;
@@ -33,6 +35,7 @@ namespace Models
 
         public bool needsUpdate = true;
         public string action { get { return _action; } protected set { _action = value; } }
+        #endregion
 
         public Mesh(double x, double y, double z, double rotationX, double rotationY, double rotationZ)
         {

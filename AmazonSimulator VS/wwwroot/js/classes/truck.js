@@ -28,6 +28,7 @@ class Truck extends THREE.Group {
 
                     var clone = instanceTruck.clone();
                     clone.position.set(0, 0, 0);
+                    clone.name = "truck";
                     selfRef.add(clone);
                 }
             }, 100);
@@ -35,6 +36,7 @@ class Truck extends THREE.Group {
         else {
             firstLoadTruck = false;
             Loading.OBJModel('obj/truck/', 'truck.obj', 'obj/truck/', 'truck.mtl', (mesh) => {
+                mesh.name = "truck";
                 instanceTruck = mesh;
                 selfRef.add(mesh);
                 selfRef._loadState = LoadStates.LOADED; 
