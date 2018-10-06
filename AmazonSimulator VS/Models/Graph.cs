@@ -6,10 +6,22 @@ namespace Models
 {
     public class Graph
     {
+        #region Properties
+
+        // Create dictionary vertices.
         Dictionary<string, Dictionary<string, Node>> vertices = new Dictionary<string, Dictionary<string, Node>>();
+        // Create dictionary nodesSmall.
         Dictionary<string, Node> nodesSmall = new Dictionary<string, Node>();
 
+        #endregion
 
+        #region Methods
+
+        /// <summary>
+        /// Adding a vertex.
+        /// </summary>
+        /// <param name="name">Name of the vertex</param>
+        /// <param name="edges">Nodes of the vertex</param>
         public void add_vertex(string name, Dictionary<string, Node> edges)
         {
             vertices[name] = edges;
@@ -81,5 +93,7 @@ namespace Models
             path.Reverse();
             return path.ToArray();
         }
+
+        #endregion
     }
 }
