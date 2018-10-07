@@ -87,7 +87,7 @@ namespace Models
                 {0.01, 0.015, 0.01},
                 {0.013, 0.01, 0.013}
             };
-            
+
             // Create randomizer.
             Random rnd = new Random();
 
@@ -101,7 +101,7 @@ namespace Models
                 for (var j = 0; j < 9; j++)
                 {
                     // Box index is random.
-                    int boxIndex = rnd.Next(0,3);
+                    int boxIndex = rnd.Next(0, 3);
 
                     // Check if box index is 2.
                     if (boxIndex == 2)
@@ -116,7 +116,7 @@ namespace Models
                     {
                         // Check if coordinate Z of box 2 - box size is lower than coordinates Z box 1.
                         if ((cordZ[2] - boxSizes[boxIndex]) < cordZ[1]) break;
-                        
+
                         // Set Z coordinates.
                         cordZ[2] -= boxSizes[boxIndex];
                         cordX[2] = cordX[0];
@@ -131,7 +131,7 @@ namespace Models
                     }
 
                     // Create new box.
-                    var newBox = new Box(cordX[2], floorY[i], cordZ[2], rnd.Next(0, 50) / 1000, 0, 0, boxSizeScale[boxIndex,0], boxSizeScale[boxIndex, 1], boxSizeScale[boxIndex, 2], this.guid);
+                    var newBox = new Box(cordX[2], floorY[i], cordZ[2], rnd.Next(0, 50) / 1000, 0, 0, boxSizeScale[boxIndex, 0], boxSizeScale[boxIndex, 1], boxSizeScale[boxIndex, 2], this.guid);
 
                     // Set X coordinates.
                     cordX[2] += boxSizes[boxIndex];

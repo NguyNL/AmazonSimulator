@@ -337,7 +337,7 @@ namespace Models
         /// <param name="path">Array of nodes for the path</param>
         /// <returns>True or false</returns>
         public void MoveOverPath(Node[] path)
-            {
+        {
             // Set that the robot has no rack.
             this.hasRack = false;
 
@@ -560,6 +560,9 @@ namespace Models
             // Check if robot has tasks.
             if (Tasks.Count > 0)
             {
+                // Set is waiting to false.
+                this.isWaiting = false;
+
                 // If robot completed his task.
                 if (Tasks.First().TaskComplete(this))
                     // Remove the task.
@@ -571,6 +574,11 @@ namespace Models
                     Tasks.First().StartTask(this);
                 // Return true.
                 return true;
+            }
+            else
+            {
+                // Set is waiting to true.
+                this.isWaiting = true;
             }
             // Return false.
             return false;

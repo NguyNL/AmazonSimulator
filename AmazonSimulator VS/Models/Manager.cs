@@ -124,12 +124,12 @@ namespace Models
         public void Start()
         {
             // Check if boat is created.
-            if(_Boat.Position == Transport.created)
+            if (_Boat.Position == Transport.created)
                 // Move boat to crane.
                 _Boat.MoveToCrane();
 
             // Check if truck is created.
-            if(_Truck.Position == Transport.created)
+            if (_Truck.Position == Transport.created)
                 // Move truck to crane.
                 _Truck.MoveToCrane();
 
@@ -137,7 +137,7 @@ namespace Models
             if (_Truck.Position == Transport.loadingDeck)
             {
                 // Check if crane status is free.
-                if(_Crane._CraneState == CraneState.free)
+                if (_Crane._CraneState == CraneState.free)
                     // Check if loading deck is free.
                     if (this._LoadingDeck == LoadingDeck.free)
                     {
@@ -261,7 +261,7 @@ namespace Models
             Thread.Sleep(13000);
             // Set loading deck to free.
             this._LoadingDeck = LoadingDeck.free;
-            
+
             // Check if crane vehicle is truck.
             if (_Crane.vehicle == "truck")
                 // Move truck away from crane.
