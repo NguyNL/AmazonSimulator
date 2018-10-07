@@ -31,6 +31,7 @@ class Robot extends THREE.Group {
                 if (instanceRobot) {
                     this.clearInterval(checkExistInstanceRobot);
 
+                    // Clone OBJ model.
                     var clone = instanceRobot.clone();
                     clone.position.set(0, 0, 0);
                     selfRef.add(clone);
@@ -39,6 +40,7 @@ class Robot extends THREE.Group {
         }
         else {
             firstLoadRobot = false;
+            // Load OBJ model.
             Loading.OBJModel('obj/robot/', 'robot.obj', 'obj/robot/', 'robot.mtl', (mesh) => {
                 instanceRobot = mesh;
                 selfRef.add(mesh);

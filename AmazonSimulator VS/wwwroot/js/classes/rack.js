@@ -32,6 +32,7 @@ class Rack extends THREE.Group {
                 if (instanceRack) {
                     this.clearInterval(checkExistInstanceRack);
 
+                    // Clone OBJ model.
                     var clone = instanceRack.clone();
                     clone.position.set(0, 0, 0);
                     selfRef.add(clone);
@@ -40,6 +41,7 @@ class Rack extends THREE.Group {
         }
         else {
             firstLoadRobot = false;
+            // Load OBJ model.
             Loading.OBJModel('obj/storage_rack/', 'rackpoly.obj', 'obj/storage_rack/', 'rackpoly.mtl', (mesh) => {
                 instanceRack = mesh;
                 selfRef.add(mesh);

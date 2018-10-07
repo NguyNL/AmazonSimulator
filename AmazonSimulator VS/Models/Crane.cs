@@ -28,8 +28,11 @@ namespace Models
         /// </summary>
         public Crane()
         {
+            // Set type to crane.
             this.type = "crane";
+            // Set crane status to free.
             this._CraneState = CraneState.free;
+            // Create unique id.
             this.guid = Guid.NewGuid();
         }
         #endregion
@@ -59,6 +62,17 @@ namespace Models
         {
             // Set crane status to unloading.
             _CraneState = CraneState.unloading;
+            // Set needsUpdate to true.
+            needsUpdate = true;
+        }
+
+        /// <summary>
+        /// Unload the boxes.
+        /// </summary>
+        public void Free()
+        {
+            // Set crane status to free.
+            _CraneState = CraneState.free;
             // Set needsUpdate to true.
             needsUpdate = true;
         }

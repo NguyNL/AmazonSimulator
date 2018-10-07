@@ -32,6 +32,7 @@ class Truck extends THREE.Group {
                 if (instanceTruck) {
                     this.clearInterval(checkExistInstanceTruck);
 
+                    // Clone OBJ model.
                     var clone = instanceTruck.clone();
                     clone.position.set(0, 0, 0);
                     clone.name = "truck";
@@ -41,10 +42,12 @@ class Truck extends THREE.Group {
         }
         else {
             firstLoadTruck = false;
+            // Load OBJ model.
             Loading.OBJModel('obj/truck/', 'truck.obj', 'obj/truck/', 'truck.mtl', (mesh) => {
                 mesh.name = "truck";
                 instanceTruck = mesh;
 
+                // Get OBJ child.
                 mesh.traverse(function (child) {
                     if (child instanceof THREE.Mesh) {
                         child.castShadow = true;
@@ -76,6 +79,7 @@ class Truck extends THREE.Group {
         }
     }
 
+    // Make brake light brighter.
     breakLights() {
         if (!this.break) {
             if (this.getObjectByName("rightBackLight"))
@@ -89,6 +93,7 @@ class Truck extends THREE.Group {
        
     }
 
+    // Make brake lights normal.
     normalLights() {
         if (this.break) {
             if (this.getObjectByName("rightBackLight"))

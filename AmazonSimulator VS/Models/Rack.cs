@@ -8,27 +8,8 @@ namespace Models
     public class Rack : Mesh, IUpdatable
     {
         #region Variables
-        // Create list of tasks for rack.
-        private List<RackTask> Tasks = new List<RackTask>();
-        // Create list of boxes for rack.
+        // Create list of boxes.
         public List<Box> Boxes = new List<Box>();
-        // Set speed.
-        private double Speed = 1;
-        // Set bool for rotation animation.
-        private bool InRotationAnimation = false;
-        // Set bool for first movement.
-        private bool FirstMovement = true;
-        #endregion
-
-        #region Properties
-        /// <summary>
-        /// Get and set position.
-        /// </summary>
-        public string Position { get; private set; }
-        /// <summary>
-        /// Get and set current position.
-        /// </summary>
-        public string CurrentPos { get; private set; }
         #endregion
 
         #region Constructors
@@ -47,14 +28,12 @@ namespace Models
             this.guid = Guid.NewGuid();
             // Set type to rack.
             this.type = "rack";
-            // Set start position.
-            this.Position = Manager.StartPoint;
-            // Set current position.
-            this.CurrentPos = Manager.StartPoint;
             // Set rotation X.
             this.rotationX = 180 * Math.PI / 180;
             // Fill the rack with boxes.
             FillRack();
+            // Set update to true.
+            needsUpdate = true;
         }
 
         /// <summary>
@@ -66,10 +45,6 @@ namespace Models
             this.guid = Guid.NewGuid();
             // Set type to rack.
             this.type = "rack";
-            // Set position.
-            this.Position = Manager.StartPoint;
-            // Set current position.
-            this.CurrentPos = Manager.StartPoint;
 
             // Set axis-X position.
             this.x = Manager.StartPointNode.x;
@@ -81,12 +56,14 @@ namespace Models
             // Set rotation axis-X.
             this.rotationX = 180 * Math.PI / 180;
             // Set rotation axis-Y.
-            this.rotationY = 90 * Math.PI / 180;
+            this.rotationY = -90 * Math.PI / 180;
             // Set rotation axis-Z.
             this.rotationZ = 0;
 
             // Fill the rack with boxes.
             FillRack();
+            // Set update to true.
+            needsUpdate = true;
         }
         #endregion
 
@@ -175,148 +152,37 @@ namespace Models
         /// <summary>
         /// Move rack over path.
         /// </summary>
-        /// <param name="path">All the paths</param>
-        public void MoveOverPath(Node[] path)
+        /// <param name="x">Axis-X</param>
+        /// <param name="z">Axis-Z</param>
+        /// <param name="rotationY">Roation axis-Y</param>
+        public void MoveOverPath(double x, double z, double rotationY)
         {
-            if (FirstMovement)
-                CheckRotationPosition(path[0]);
+            // Set rack axis-X.
+            this.x = x;
+            // Set rack axis-Z.
+            this.z = z;
+            // Set rack rotation axis-Y.
+            this.rotationY = -rotationY;
 
-            if (!InRotationAnimation)
-            {
-                bool AllowedToMove = true;
-                int CurrentRow = (int)Math.Floor(this.z / 25);
-                int CurrentColumn = (int)Math.Floor(this.x / 25);
-
-                if ((CurrentRow.ToString() + CurrentColumn.ToString()) != CurrentPos)
-                {
-                    CurrentPos = CurrentRow.ToString() + CurrentColumn.ToString();
-                }
-
-                List<Rack> RackList = Manager.AllRacks
-                    .Where(
-                        rack => rack.CurrentPos == this.CurrentPos
-                    ).ToList();
-
-                if (RackList.Count > 0)
-                    if (RackList[0].guid != this.guid)
-                        AllowedToMove = false;
-
-                if (AllowedToMove)
-                {
-                    int NextRow = path.First().x == this.x ? path.First().z > this.z ? CurrentRow - 1 : CurrentRow + 1 : CurrentRow;
-                    int NextColumn = path.First().z == this.z ? path.First().x > this.x ? CurrentColumn + 1 : CurrentColumn - 1 : CurrentColumn;
-
-                    List<Rack> RackListNextStep = Manager.AllRacks
-                        .Where(
-                            rack => rack.CurrentPos == (NextRow.ToString() + NextColumn.ToString()) &&
-                            rack.guid != this.guid
-                        ).ToList();
-
-                    if (RackListNextStep.Count > 0)
-                        AllowedToMove = false;
-                }
-
-                if (AllowedToMove)
-                {
-                    this.z = path.First().x == this.x ?
-                        path.First().z > this.z ?
-                        this.z += Speed :
-                        this.z -= Speed :
-                        this.z;
-
-                    this.x = path.First().z == this.z ?
-                        path.First().x > this.x ?
-                        this.x += Speed :
-                        this.x -= Speed :
-                        this.x;
-                }
-            }
-
-            if (path.First().x == this.x && path.First().z == this.z)
-            {
-                if (path.Length > 1)
-                    CheckRotationPosition(path[1]);
-                else
-                    FirstMovement = true;
-            }
-
-            if (path.First().x == this.x && path.First().z == this.z && !InRotationAnimation)
-                Tasks.First().RemovePath();
+            needsUpdate = true;
         }
 
-        private void CheckRotationPosition(Node node)
-        {
-            if (this.x > node.x && this.z == node.z)
-                RotateObject(90);
-
-            else if (this.x < node.x && this.z == node.z)
-                RotateObject(-90);
-
-            else if (this.z < node.z && this.x == node.x)
-                RotateObject(0);
-
-            else if (this.z > node.z && this.x == node.x)
-                RotateObject(180);
-        }
-
-        public void RotateObject(int degrees)
-        {
-            int currentDegrees = (int)(this.rotationY / Math.PI * 180);
-
-            if (currentDegrees < 0 && degrees == 180)
-                degrees *= -1;
-
-            if (currentDegrees >= 180 && degrees == -90)
-                degrees = 270;
-
-            if (currentDegrees != degrees)
-            {
-                InRotationAnimation = true;
-                if (this.rotationY > (degrees * Math.PI / 180))
-                {
-                    this.rotationY -= 1 * Math.PI / 180;
-                }
-                else
-                {
-                    this.rotationY += 1 * Math.PI / 180;
-                }
-            }
-            else
-            {
-                if (currentDegrees == -180)
-                    this.rotationY = 180 * Math.PI / 180;
-
-                if (currentDegrees == 270)
-                    this.rotationY = -90 * Math.PI / 180;
-
-                InRotationAnimation = false;
-                FirstMovement = false;
-            }
-        }
-
-        public void Move(Node[] path, string position)
-        {
-            Tasks.Add(new RackTask(path));
-            this.Position = position;
-        }
-
-
+        /// <summary>
+        /// Update function for the boat.
+        /// </summary>
+        /// <param name="tick">Tick speed</param>
+        /// <returns>True or False.</returns>
         public override bool Update(int tick)
         {
-            //foreach (Box box in Boxes)
-            //    box.Update(tick);
-
-            if (Tasks.Count > 0)
+            // Check if needsUpdate is true.
+            if (needsUpdate)
             {
-                if (Tasks.First().TaskComplete(this))
-                    Tasks.RemoveAt(0);
-
-                if (Tasks.Count > 0)
-                    Tasks.First().StartTask(this);
-
+                // Set needsUpdate to false.
+                needsUpdate = false;
+                // Return true.
                 return true;
             }
-
+            // Return false.
             return false;
         }
         #endregion

@@ -84,14 +84,10 @@ function loadProgressUpdate(progress, processesCount, loading = true) {
     //);
 }
 
-// Put boat container back on boat.
+// Put truck container back on truck.
 function removeTruckContainer(truck) {
     //if (animationInProgress) return;
     //if (!loadDeckIsLoadedWith) return;
-
-    console.log("Wij zijn hier ingekomen");
-    console.log(truck);
-
     animationInProgress = true;
 
     var container = truck.getObjectByName("truck");
@@ -180,6 +176,7 @@ function getTruckContainer(truck) {
                     onComplete: function () {
                         TweenMax.to(cranemove.children[1].scale, 2, { y: 1 });
                         TweenMax.to([cranemove.children[1].position, cranemove.children[2].position], 2, { y: 0 });
+
                         var container = truck.getObjectByName("truck");
                         container = container.getObjectByName("ContainerbigTruck_mesh1355834799.005");
                         TweenMax.to(container.position, 2,
@@ -228,13 +225,15 @@ function getTruckContainer(truck) {
 }
 
 // Put boat container back on boat.
-function removeBoatContainer() {
-    if (animationInProgress) return;
-    if (!loadDeckIsLoadedWith) return;
+function removeBoatContainer(boat) {
+    //if (animationInProgress) return;
+    //if (!loadDeckIsLoadedWith) return;
+
+    var container = boat.getObjectByName("boatContainer");
 
     animationInProgress = true;
 
-    TweenMax.to(boatContainer.position, 2,
+    TweenMax.to(container.position, 2,
         {
             z: -0.632,
             onUpdate: function () { loadProgressUpdate((isNaN(this.progress()) ? 1 : this.progress()), 6, false); },
@@ -245,13 +244,13 @@ function removeBoatContainer() {
                     cranemove.children[2].position,
                 ], 2, { y: 0 });
 
-                TweenMax.to(boatContainer.position, 2,
+                TweenMax.to(container.position, 2,
                     {
-                        y: 2.96,
+                        y: 0.56,
                         onUpdate: function () { loadProgressUpdate((isNaN(this.progress()) ? 1 : this.progress()), 6, false); },
                         onComplete: function () {
 
-                            TweenMax.to(boatContainer.rotation, 2,
+                            TweenMax.to(container.rotation, 2,
                                 {
                                     y: 0,
                                     onUpdate: function () { loadProgressUpdate((isNaN(this.progress()) ? 1 : this.progress()), 6, false); },
@@ -262,18 +261,18 @@ function removeBoatContainer() {
                                             cranemove.children[2].position], 4, { x: 0 });
 
                                         TweenMax.to(
-                                            boatContainer.position, 4,
+                                            container.position, 4,
                                             {
-                                                x: -1.16,
+                                                x: -1.1789,
                                                 onUpdate: function () { loadProgressUpdate((isNaN(this.progress()) ? 1 : this.progress()), 6, false); },
                                                 onComplete: function () {
                                                     TweenMax.to(cranemove.children[1].scale, 2, { y: 2.6 });
                                                     TweenMax.to(cranemove.children[1].position, 2, { y: -1.3 });
                                                     TweenMax.to(cranemove.children[2].position, 2, { y: -0.56 });
 
-                                                    TweenMax.to(boatContainer.position, 2,
+                                                    TweenMax.to(container.position, 2,
                                                         {
-                                                            y: 2.4,
+                                                            y: -0.000099,
                                                             onUpdate: function () { loadProgressUpdate((isNaN(this.progress()) ? 1 : this.progress()), 6, false); },
                                                             onComplete: function () {
                                                                 TweenMax.to(cranemove.children[1].scale, 2, { y: 1 });
@@ -305,30 +304,18 @@ function removeBoatContainer() {
 }
 
 // Get boat container with crane.
-function getBoatContainer() {
-    if (animationInProgress) return;
-    if (loadDeckIsLoadedWith) return unloadLoadingDeck();
+function getBoatContainer(boat) {
+    //if (animationInProgress) return;
+    //if (loadDeckIsLoadedWith) return unloadLoadingDeck();
 
     animationInProgress = true;
     loadDeckIsLoadedWith = "boat";
 
-    var distanceAnimationRatio = 0.1;
-    var animationTimeX = Math.abs(boat.position.x - boatX) * distanceAnimationRatio;
-    var animationTimeZ = Math.abs(boat.position.z - boatZ) * distanceAnimationRatio;
-
-    if (boat.position.x !== boatX)
-        TweenMax.to(boat.position, animationTimeX, { x: boatX });
-
-    if (boat.position.z !== boatZ)
-        TweenMax.to(boat.position, animationTimeZ, { z: boatZ, });
-
-    var AnimationDelay = animationTimeX > animationTimeZ ? animationTimeX : animationTimeZ;
-
-    TweenMax.to(cranemove.position, Math.abs(boatLoadXPosition - cranemove.position.x) * distanceAnimationRatio, {
-        x: boatLoadXPosition,
-        delay: AnimationDelay,
+    TweenMax.to(cranemove.position, 2, {
+        x: boatX,
         onUpdate: function () { loadProgressUpdate((isNaN(this.progress()) ? 1 : this.progress()), 7); },
         onComplete: function () {
+
             TweenMax.to(cranemove.children[1].scale, 2, { y: 2.6 });
             TweenMax.to(cranemove.children[1].position, 2, { y: -1.3 });
 
@@ -337,43 +324,48 @@ function getBoatContainer() {
                     y: -0.56,
                     onUpdate: function () { loadProgressUpdate(this.progress(), 7); },
                     onComplete: function () {
+
                         TweenMax.to(cranemove.children[1].scale, 2, { y: 1 });
                         TweenMax.to([cranemove.children[1].position, cranemove.children[2].position], 2, { y: 0 });
 
-                        TweenMax.to(boatContainer.position, 2,
-                            {
 
-                                y: 2.96,
+                        var container = boat.getObjectByName("boatContainer");
+                        TweenMax.to(container.position, 2,
+                            {
+                                y: 0.562,
                                 onUpdate: function () { loadProgressUpdate(this.progress(), 7); },
                                 onComplete: function () {
+
                                     TweenMax.to([
                                         cranemove.children[0].position,
                                         cranemove.children[1].position,
                                         cranemove.children[2].position], 4, { x: 2.1 });
 
                                     TweenMax.to(
-                                        boatContainer.position, 4,
+                                        container.position, 4,
                                         {
-                                            x: 0.94,
+                                            x: 0.92,
                                             onUpdate: function () { loadProgressUpdate(this.progress(), 7); },
                                             onComplete: function () {
+
                                                 TweenMax.to([
-                                                    boatContainer.rotation
+                                                    container.rotation
                                                 ], 2, {
-                                                        y: -90 * Math.PI / 180,
+                                                        y: 90 * Math.PI / 180,
                                                         onUpdate: function () { loadProgressUpdate(this.progress(), 7); },
                                                         onComplete: function () {
+
                                                             TweenMax.to(cranemove.children[1].scale, 2, { y: 1.9 });
                                                             TweenMax.to(cranemove.children[1].position, 2, { y: -0.765 });
                                                             TweenMax.to(cranemove.children[2].position, 2, { y: -0.365 });
-                                                            TweenMax.to(boatContainer.position, 2,
+                                                            TweenMax.to(container.position, 2,
                                                                 {
-                                                                    y: 2.595,
+                                                                    y: 0.196,
                                                                     onUpdate: function () { loadProgressUpdate(this.progress(), 7); },
                                                                     onComplete: function () {
-                                                                        TweenMax.to(boatContainer.position, 2,
+                                                                        TweenMax.to(container.position, 2,
                                                                             {
-                                                                                z: -0.4,
+                                                                                z: -0.45,
                                                                                 onUpdate: function () { loadProgressUpdate(this.progress(), 7); },
                                                                                 onComplete: function () {
                                                                                     animationInProgress = false;

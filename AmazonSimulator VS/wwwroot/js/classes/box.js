@@ -32,6 +32,7 @@ class Box extends THREE.Group {
                 if (instanceBox) {
                     this.clearInterval(checkExistInstance);
 
+                    // Clone OBJ model.
                     var clone = instanceBox.clone();
                     clone.position.set(0, 0, 0);
                     selfRef.add(clone);
@@ -40,6 +41,7 @@ class Box extends THREE.Group {
         }
         else {
             firstLoadBox = false;
+            // Load OBJ model.
             Loading.OBJModel('obj/cardboard_box/', 'cardboard_box.obj', 'obj/cardboard_box/', 'cardboard_box.mtl', (mesh) => {
                 instanceBox = mesh;
                 selfRef.add(mesh);

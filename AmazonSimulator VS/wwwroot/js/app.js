@@ -1,7 +1,3 @@
-// Variables.
-var exampleSocket;
-var boxes = [];
-
 // Onload function.
 window.onload = function () {
 
@@ -46,11 +42,6 @@ window.onload = function () {
         // add lights to scene.
         scene.add(light);
         scene.add(light.target);
-
-        // Ambient light.
-        var AmbientLight = new THREE.AmbientLight(0x404040);
-        light.intensity = 4;
-        scene.add(AmbientLight);
 
         /**
          ** Renderer settings.
@@ -146,6 +137,11 @@ window.onload = function () {
         var mesh = new THREE.Mesh(cube, cubeMaterial);
         scene.add(mesh);
 
+        // Ambient light.
+        var AmbientLight = new THREE.AmbientLight(0x404040);
+        AmbientLight.intensity = 4;
+        scene.add(AmbientLight);
+
         THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
 
         /**
@@ -232,10 +228,12 @@ window.onload = function () {
                 
                 switch (command.parameters.type) {
                     case "robot":
+                        // Remove robot object.
                         robotsGroup.remove(object);
                         break;
                 }
 
+                // Remove object from world.
                 delete worldObjects[command.parameters.guid];
             }
         }
@@ -245,9 +243,11 @@ window.onload = function () {
                 var robot;
 
                 if (Object.keys(worldObjects).indexOf(command.parameters.guid) < 0) {
+                    // Create new robot.
                     robot = new Robot();
                     
                     worldObjects[command.parameters.guid] = robot;
+                    // Add robot to group.
                     robotsGroup.add(robot);
                 } else {
                     robot = worldObjects[command.parameters.guid];
@@ -264,14 +264,17 @@ window.onload = function () {
                 var rack;
 
                 if (Object.keys(worldObjects).indexOf(command.parameters.guid) < 0) {
+                    // Create new rack.
                     rack = new Rack();
 
                     worldObjects[command.parameters.guid] = rack;
+                    // Add rack to group.
                     racksGroup.add(rack);
 
+                    // Fill rack with boxes.
                     command.parameters.Boxes.forEach(function (boxInfo) {
                         var box;
-                        
+                        // Create a new box.
                         box = new Box();
 
                         box.position.set(boxInfo.x, boxInfo.y, boxInfo.z);
@@ -279,7 +282,9 @@ window.onload = function () {
                         box.scale.set(boxInfo.scaleX, boxInfo.scaleY, boxInfo.scaleZ);
 
                         worldObjects[boxInfo.guid] = box;
+                        // Add box to rack.
                         rack.add(box);
+                        // Add box to array.
                         boxes.push(box);
                     });
 
@@ -342,7 +347,6 @@ window.onload = function () {
             }
 
             if (command.parameters.type === "crane") {
-                console.log(command.parameters);
                 if (command.parameters.vehicle === "truck" && command.parameters._CraneState === 1) {
                     if (Object.keys(worldObjects).indexOf(command.parameters.vehicleID) >= 0)
                         getTruckContainer(worldObjects[command.parameters.vehicleID]);
@@ -350,6 +354,16 @@ window.onload = function () {
                 if (command.parameters.vehicle === "truck" && command.parameters._CraneState === 2) {
                     if (Object.keys(worldObjects).indexOf(command.parameters.vehicleID) >= 0)
                         removeTruckContainer(worldObjects[command.parameters.vehicleID]);
+                }
+
+                if (command.parameters.vehicle === "boat" && command.parameters._CraneState === 1) {
+                    if (Object.keys(worldObjects).indexOf(command.parameters.vehicleID) >= 0)
+                        getBoatContainer(worldObjects[command.parameters.vehicleID]);
+                }
+
+                if (command.parameters.vehicle === "boat" && command.parameters._CraneState === 2) {
+                    if (Object.keys(worldObjects).indexOf(command.parameters.vehicleID) >= 0)
+                        removeBoatContainer(worldObjects[command.parameters.vehicleID]);
                 }
             }
         }

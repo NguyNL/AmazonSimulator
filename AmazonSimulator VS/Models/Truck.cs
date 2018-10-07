@@ -7,7 +7,7 @@ namespace Models
 {
     public class Truck : Mesh, IUpdatable
     {
-        #region Variables
+        #region Properties
         // Set maximum speed of truck.
         private double MaxSpeed = 0.08;
         // Set current speed of truck.
@@ -18,9 +18,6 @@ namespace Models
         private bool MovingAwayFromCrane = false;
         // Integer for the amount of racks loaded.
         public int NumberOfRacksLoaded = 4;
-        #endregion
-
-        #region Properties
         /// <summary>
         /// Position of truck.
         /// </summary>
@@ -91,24 +88,26 @@ namespace Models
         /// </summary>
         private void MoveToLoadStation()
         {
-            // check if MovingToCrane is true and MovingAwayFromCrane is false.
+            // Check if MovingToCrane is true and MovingAwayFromCrane is false.
             if (MovingToCrane && !MovingAwayFromCrane)
             {
+                // Check if truck is at loading deck.
                 if (this.Position != Transport.toLoadingDeck)
+                    // Set position to loading deck.
                     this.Position = Transport.toLoadingDeck;
 
-                // check is the truck's Z position is higher than 3.5
+                // Check is the truck's Z position is higher than 3.5
                 if (this.z > 3.5)
                 {
-                    // lower the truck's Z position by deducting CurrentSpeed.
+                    // Lower the truck's Z position by deducting CurrentSpeed.
                     this.z -= CurrentSpeed;
                     // Set needsUpdate variable to true.
                     needsUpdate = true;
                 }
-                // check if truck's Z position is higher than 0.
+                // Check if truck's Z position is higher than 0.
                 else if (this.z > 0)
                 {
-                    // check if Currentspeed is lower than 0.00004 otherwise.
+                    // Check if Currentspeed is lower than 0.00004 otherwise.
                     if (CurrentSpeed < 0.00004)
                         // Set CurrentSpeed to 0.00004.
                         CurrentSpeed = 0.00004;
@@ -116,7 +115,7 @@ namespace Models
                         // Set CurrentSpeed to CurrentSpeed devided the steps that are left (Slow the CurrentSpeed).
                         CurrentSpeed -= CurrentSpeed / (this.z / CurrentSpeed);
 
-                    // check if truck's Z is lower than 0.001.
+                    // Check if truck's Z is lower than 0.001.
                     if (this.z < 0.0001)
                     {
                         // Set truck's Z position to 0.
@@ -124,7 +123,9 @@ namespace Models
                         // Set MovingToCrane to false.
                         MovingToCrane = false;
 
+                        // Check if truck position is at loading deck.
                         if (this.Position != Transport.loadingDeck)
+                            // Set truck position is at loading deck.
                             this.Position = Transport.loadingDeck;
                     }
                     else
@@ -143,9 +144,11 @@ namespace Models
         private void MoveAwayFromLoadStation()
         {
             // Check if MovingAwayFromCrane is true and MovingToCrane is false.
-            if(MovingAwayFromCrane && !MovingToCrane)
+            if (MovingAwayFromCrane && !MovingToCrane)
             {
+                // Check if truck position is away from the loading dock.
                 if (this.Position != Transport.fromLoadingDeck)
+                    // Set truck position to from the loading deck.
                     this.Position = Transport.fromLoadingDeck;
 
                 // Repeatedly add 0.0005 to CurrentSpeed.
@@ -182,7 +185,9 @@ namespace Models
         /// <returns>True or False.</returns>
         public override bool Update(int tick)
         {
+            // Move truck to load station.
             MoveToLoadStation();
+            // Move truck aray from load station.
             MoveAwayFromLoadStation();
             // Check if needsUpdate is true.
             if (needsUpdate)

@@ -21,6 +21,10 @@ namespace Models
         public static readonly int[] StartPointCoord = { 0, 7 };
         // Grid start point pixels.
         public static readonly Node StartPointNode = new Node { x = 175, y = 0, z = 0 };
+        // Boolean for robot in loading deck.
+        public static bool RobotInLoadingDeckArea = false;
+        // Boolean for racks to unload is set.
+        private bool RacksToUnloadSet = false;
         #endregion
 
         #region Properties
@@ -31,16 +35,32 @@ namespace Models
         /// <summary>
         /// All the places where you can put racks.
         /// </summary>
-        public Dictionary<int, RackPlace> RackPlaces { get; private set; }
+        public Dictionary<int, PlaceInfo> RackPlaces { get; private set; }
+        /// <summary>
+        /// All the wait places for the robot.
+        /// </summary>
+        public Dictionary<int, PlaceInfo> RobotWaitPlaces { get; private set; }
         /// <summary>
         /// All the positions of the robots.
         /// </summary>
         public Dictionary<int, string> RobotPositions { get; private set; }
 
-        // List of all robots.
+        /// <summary>
+        /// List of all robots
+        /// </summary>
         public static List<Robot> AllRobots { get; private set; }
-        // List of all racks.
+        /// <summary>
+        /// List of all racks.
+        /// </summary>
         public static List<Rack> AllRacks { get; private set; }
+        /// <summary>
+        /// Get guid of robot in loading deck.
+        /// </summary>
+        public static Guid RobotInLoadingDeckGuid { get; private set; }
+        /// <summary>
+        /// Check amount of racks to unload.
+        /// </summary>
+        private int RacksToUnload { get; set; }
 
         // Truck.
         public Truck _Truck { get; private set; }
@@ -71,7 +91,9 @@ namespace Models
             // Creating the grid map.
             this.Map = new Dictionary<string, Node>();
             // Creating dictionary of all the rack places.
-            this.RackPlaces = new Dictionary<int, RackPlace>();
+            this.RackPlaces = new Dictionary<int, PlaceInfo>();
+            // Creating dictionary of all the robot wait places.
+            this.RobotWaitPlaces = new Dictionary<int, PlaceInfo>();
             // Creating dictionary of all robot positions.
             this.RobotPositions = new Dictionary<int, string>();
 
@@ -79,6 +101,8 @@ namespace Models
             AllRobots = new List<Robot>();
             // Creating a list of all racks.
             AllRacks = new List<Rack>();
+            // Set amount of racks to unload.
+            this.RacksToUnload = -1;
 
             // Setting the truck object.
             this._Truck = truck;
@@ -127,50 +151,240 @@ namespace Models
             // Check if boat is at loading deck.
             if (_Boat.Position == Transport.loadingDeck)
             {
-                // Create random amount of racks for the next truck.
-                _Boat.NumberOfRacksLoaded = _Random.Next(1, 4);
-                // Check if loading deck is free.
-                if (this._LoadingDeck == LoadingDeck.free)
-                    // Set loading deck to is loading.
-                    this._LoadingDeck = LoadingDeck.isLoading;
+                // Check if crane status is free.
+                if (_Crane._CraneState == CraneState.free)
+                    // Check if loading deck is free.
+                    if (this._LoadingDeck == LoadingDeck.free)
+                    {
+                        // Crane is loading the boat container.
+                        _Crane.Load("boat", _Boat.guid);
+                        // Start a new thread with a delay.
+                        Thread t = new Thread(new ThreadStart(CraneStartLoadingVehicle));
+                        t.Start();
+                    }
             }
 
-            // If loading deck is loading and crane status is loading.
+            // Check if loading deck is loading and crane status is loading.
             if (this._LoadingDeck == LoadingDeck.isLoading && _Crane._CraneState == CraneState.loading)
             {
-                //this.MoveRobots();
-                this._LoadingDeck = LoadingDeck.isUnloading;
+                this.UnLoadingContainer();
+            }
+
+            // Check if loading deck is unloading and crane status is loading.
+            if (this._LoadingDeck == LoadingDeck.isUnloading && _Crane._CraneState == CraneState.loading)
+            {
+                // Unload crane.
+                _Crane.Unload();
+                // Start a new thread with a delay.
+                Thread t = new Thread(new ThreadStart(CraneStartUnLoading));
+                t.Start();
+            }
+
+            // Create robot in waiting places to list.
+            var fullWaitingPlaces = RobotWaitPlaces.Where(x => x.Value.HasMeshOnIt == true).ToList();
+
+            // Get all data.
+            var data = AllRobots.Where(x => x.isWaiting && x.z != 100 &&
+                fullWaitingPlaces.Where(j => j.Value.HasMeshOnIt == true && j.Value.guid == x.guid).ToList().Count == 0
+            ).ToList();
+
+            // Check if there is data.
+            if (data.Count > 0)
+            {
+                // Get all robots in data.
+                foreach (Robot robot in data)
+                {
+                    // Set waiting position.
+                    var waitingPosition = FreeWaitingPostion();
+
+                    // Check if waiting position is not empty.
+                    if (waitingPosition != "")
+                    {
+                        // Move robot.
+                        robot.Move(g.shortest_path(robot.Position, waitingPosition), waitingPosition);
+
+                        // Set waiting position update.
+                        var waitingPositionupdate = RobotWaitPlaces.Where(x => x.Value.Coord == waitingPosition).ToList().First();
+
+                        // Set robot on waiting position true.
+                        waitingPositionupdate.Value.HasMeshOnIt = true;
+                        // Set robot on waiting position unique id.
+                        waitingPositionupdate.Value.guid = robot.guid;
+                    }
+                }
             }
         }
 
+        /// <summary>
+        /// Return robot waiting position coordinates.
+        /// </summary>
+        /// <returns>Coordinates or empty</returns>
+        private string FreeWaitingPostion()
+        {
+            // Loop through robot wait places.
+            for (int i = 0; i < RobotWaitPlaces.Count; i++)
+            {
+                // Set place index to count.
+                int placeIndex = i;
+                // Check if count + 1 is higher than robot places count / 2.
+                if ((i + 1) > (RobotWaitPlaces.Count() / 2))
+                    // Set placeindex.
+                    placeIndex = (RobotWaitPlaces.Count - i) + (RobotWaitPlaces.Count() / 2) - 1;
+
+                // Check if robot wait places has no robot on it.
+                if (!RobotWaitPlaces[placeIndex].HasMeshOnIt)
+                    // Return coordinates of wait places.
+                    return RobotWaitPlaces[placeIndex].Coord;
+
+            }
+            // Return null.
+            return "";
+        }
+
+        /// <summary>
+        /// Start loading.
+        /// </summary>
         private void CraneStartLoadingVehicle()
         {
+            // Wait for 13 seconds.
             Thread.Sleep(13000);
+            // Set loading deck to loading.
             this._LoadingDeck = LoadingDeck.isLoading;
         }
 
-        private void MoveRobots()
+        /// <summary>
+        /// Start unloading.
+        /// </summary>
+        private void CraneStartUnLoading()
         {
-            var places = RackPlaces
-                .Where(x => x.Value.HasRackOnIt == false)
-                .OrderBy(x => _Random.Next()).ToList();
+            // Wait for 13 seconds.
+            Thread.Sleep(13000);
+            // Set loading deck to free.
+            this._LoadingDeck = LoadingDeck.free;
+            
+            // Check if crane vehicle is truck.
+            if (_Crane.vehicle == "truck")
+                // Move truck away from crane.
+                _Truck.MoveAwayFromCrane();
 
-            int amount = _Truck.NumberOfRacksLoaded;
+            // Check if crane vehicle is boat.
+            if (_Crane.vehicle == "boat")
+                // Move truck away from crane.
+                _Boat.MoveAwayFromCrane();
+        }
 
-            for(int i = 0; i < amount; i++)
+        /// <summary>
+        /// Unload racks from container with robots.
+        /// </summary>
+        private void UnLoadingContainer()
+        {
+            // Check if vehicle is a truck and racks to unload is not set.
+            if (_Crane.vehicle == "truck" && !RacksToUnloadSet)
             {
-                if(AllRobots[i].Position != StartPoint)
-                {
-                    AllRobots[i].Move(g.shortest_path(AllRobots[i].Position, StartPoint), StartPoint);
-                }
-
-                Robot robot = AllRobots[i];
-                Rack rack = World.CreateRack();
-
-                AllRobots[i].Move(g.shortest_path(AllRobots[i].Position, places[i].Value.Coord), places[i].Value.Coord);
-
-                rack.Move(g.shortest_path(rack.Position, places[i].Value.Coord), places[i].Value.Coord);
+                // Racks to unload have been set.
+                RacksToUnloadSet = true;
+                // Racks to unload is amount of racks the truck has.
+                RacksToUnload = _Truck.NumberOfRacksLoaded;
             }
+            // Check if vehicle is boat and racks to unload is not set.
+            else if (_Crane.vehicle == "boat" && !RacksToUnloadSet)
+            {
+                // Racks to unload have been set.
+                RacksToUnloadSet = true;
+                // Racks to unload is amount of racks the boat has.
+                RacksToUnload = _Boat.NumberOfRacksLoaded;
+            }
+
+            // If amount of racks that need to be unloaded is higher than 0.
+            if (RacksToUnload > 0)
+            {
+                // Get all waiting robots.
+                var waitingRobots = RobotWaitPlaces
+               .Where(x => x.Value.HasMeshOnIt == true).ToList();
+
+                // Check if robot is not in loading deck area.
+                if (!RobotInLoadingDeckArea)
+                {
+                    // Check if amount of waiting robots is higher than 0.
+                    if (waitingRobots.Count > 0)
+                    {
+                        // Set data to list.
+                        var data = AllRobots.Where(x => x.guid == waitingRobots.Last().Value.guid).ToList();
+                        // Check if there is data.
+                        if (data.Count > 0)
+                        {
+                            // Set robot.
+                            Robot robot = data.First();
+                            // Set the robot unique id into the loading deck.
+                            RobotInLoadingDeckGuid = robot.guid;
+                            // Move the robot.
+                            robot.Move(g.shortest_path(robot.Position, StartPoint), StartPoint);
+                            // Set that there is a robot in the loading deck.
+                            RobotInLoadingDeckArea = true;
+                            // Set that the robot waiting spot has been emptied.
+                            waitingRobots.Last().Value.HasMeshOnIt = false;
+                        }
+                    }
+                }
+                else
+                {
+                    // Get robot data.
+                    var data = AllRobots.Where(x => x.guid == RobotInLoadingDeckGuid && x.CurrentPos == StartPoint).ToList();
+                    // Check if there is data.
+                    if (data.Count > 0)
+                    {
+                        // Set robot.
+                        Robot robot = data.First();
+                        // Check if robot doesn't have a rack.
+                        if (!robot.hasRack)
+                        {
+                            // Get all places for the racks.
+                            var places = RackPlaces
+                           .Where(x => x.Value.HasMeshOnIt == false)
+                           .OrderBy(x => _Random.Next()).ToList();
+
+                            // Check if there is a spot open for the racks.
+                            if (places.Count > 0)
+                            {
+                                // Create a rack.
+                                Rack rack = World.CreateRack();
+
+                                // Move the robot with the rack to the empty place.
+                                robot.Move(g.shortest_path(robot.Position, places.First().Value.Coord), places.First().Value.Coord, rack.guid);
+
+                                // Set the empty spot to taken.
+                                places.First().Value.HasMeshOnIt = true;
+                                // Set the unique id of the rack on the spot.
+                                places.First().Value.guid = rack.guid;
+                                // Remove one item of the racks that need to be unloaded.
+                                this.RacksToUnload--;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Check if all racks is lower than 8.
+                if (AllRacks.Count < 8)
+                {
+                    // Racks to unload have not been set.
+                    RacksToUnloadSet = false;
+                    // Set loading deck to unloading.
+                    this._LoadingDeck = LoadingDeck.isUnloading;
+                }
+                else
+                    // Loading container.
+                    LoadingContainer();
+            }
+        }
+
+        /// <summary>
+        /// Load a container with racks.
+        /// </summary>
+        private void LoadingContainer()
+        {
+            Console.WriteLine("Here");
         }
         #endregion
     }

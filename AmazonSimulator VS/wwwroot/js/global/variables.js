@@ -15,7 +15,7 @@ var camera,
 
     // Crane boat loading variables.
     boatLoadXPosition = -4,
-    boatX = 2.15,
+    boatX = -4,
     boatZ = -2.9,
 
     // Crane truck loading variables.
@@ -31,4 +31,10 @@ var camera,
     // Animation.
     animationInProgress = false,
     allProcesses = [],
-    allProcessesIndex = 0;
+    allProcessesIndex = 0,
+
+    // Socket.
+    exampleSocket,
+
+    // Boxes array.
+    boxes = [];

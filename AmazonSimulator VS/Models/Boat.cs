@@ -87,14 +87,16 @@ namespace Models
         /// </summary>
         public void MoveAwayFromCrane() => MovingAwayFromCrane = true;
 
-        /// <summary>
-        /// Function to move the boat to the Load station / dock
-        /// </summary>
         private void MoveToLoadStation()
         {
             // check if MovingToCrane is true and MovingAwayFromCrane is false.
             if (MovingToCrane && !MovingAwayFromCrane)
             {
+                // Check if truck is at loading deck.
+                if (this.Position != Transport.toLoadingDeck)
+                    // Set position to loading deck.
+                    this.Position = Transport.toLoadingDeck;
+
                 // check is the boat's Z position is higher than 8
                 if (this.z > 8)
                 {
@@ -120,8 +122,11 @@ namespace Models
                         this.z = 0;
                         // Set MovingToCrane to false.
                         MovingToCrane = false;
-                        // Start function MoveAwayFromCrane.
-                        this.MoveAwayFromCrane();
+
+                        // Check if boat is not at loadingdeck.
+                        if (this.Position != Transport.loadingDeck)
+                            // Set boat position at loadingdeck.
+                            this.Position = Transport.loadingDeck;
                     }
                     else
                         // Set boat's Z position by deducting Z - CurrentSpeed.
@@ -140,6 +145,11 @@ namespace Models
             // Check if MovingAwayFromCrane is true and MovingToCrane is false.
             if (MovingAwayFromCrane && !MovingToCrane)
             {
+                // Check if boat position is not fromLoadingdeck.
+                if (this.Position != Transport.fromLoadingDeck)
+                    // Set boat position to fromLoadingDeck.
+                    this.Position = Transport.fromLoadingDeck;
+
                 // Repeatedly add 0.00005 to CurrentSpeed.
                 CurrentSpeed += 0.00005;
                 // Check if Currentspeed is higher than the MaxSpeed.
@@ -155,8 +165,11 @@ namespace Models
                     this.z = 30;
                     // Set MovingAwayFromCrane to false.
                     MovingAwayFromCrane = false;
-                    // Start function MoveToCrane.
-                    this.MoveToCrane();
+
+                    // Check if transport is not done.
+                    if (this.Position != Transport.finish)
+                        // Set transport to done.
+                        this.Position = Transport.finish;
                 }
                 // Set needsUpdate to true.
                 needsUpdate = true;
@@ -170,7 +183,9 @@ namespace Models
         /// <returns>True or False.</returns>
         public override bool Update(int tick)
         {
+            // Call move to load station.
             MoveToLoadStation();
+            // Call move away from load station.
             MoveAwayFromLoadStation();
             // Check if needsUpdate is true.
             if (needsUpdate)
