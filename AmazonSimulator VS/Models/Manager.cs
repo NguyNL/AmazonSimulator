@@ -8,6 +8,8 @@ namespace Models
 {
     public class Manager
     {
+        #region Properties
+
         public Dictionary<string, Node> Map { get; private set; }
         public Dictionary<int, RackPlace> RackPlaces { get; private set; }
         public Dictionary<int, string> RobotPositions { get; private set; }
@@ -33,7 +35,9 @@ namespace Models
         private string Vehicle { get; set; }
 
         public Graph g { get; set; }
+        #endregion
 
+        #region Constructors
         public Manager(Truck truck, Boat boat, Crane crane)
         {
             this.Map = new Dictionary<string, Node>();
@@ -51,6 +55,9 @@ namespace Models
 
             this.LoadingDeck = LoadingDeck.free;
         }
+        #endregion
+
+        #region Methods
 
         public void Start()
         {
@@ -115,5 +122,6 @@ namespace Models
                 rack.Move(g.shortest_path(rack.Position, places[i].Value.Coord), places[i].Value.Coord);
             }
         }
+        #endregion
     }
 }

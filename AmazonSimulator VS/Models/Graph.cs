@@ -33,6 +33,12 @@ namespace Models
                 });
         }
 
+        /// <summary>
+        /// Find shortest path
+        /// </summary>
+        /// <param name="start">Start position</param>
+        /// <param name="finish">End position</param>
+        /// <returns>Array of positions</returns>
         public Node[] shortest_path(string start, string finish)
         {
             var previous = new Dictionary<string, string>();

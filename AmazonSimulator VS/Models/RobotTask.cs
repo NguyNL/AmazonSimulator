@@ -41,8 +41,11 @@ namespace Models
         /// </summary>
         public void RemovePath()
         {
+            // List of nodes.
             List<Node> pathList = path.ToList();
+            // Remove first item.
             pathList.RemoveAt(0);
+            // Convert list to array.
             path = pathList.ToArray();
         }
         #endregion

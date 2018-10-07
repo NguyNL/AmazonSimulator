@@ -16,6 +16,9 @@ namespace Models
         /// Which vehicle.
         /// </summary>
         public string vehicle { get; private set; }
+        /// <summary>
+        /// Id of the vehicle.
+        /// </summary>
         public Guid vehicleID { get; private set; }
         #endregion
 
@@ -32,19 +35,34 @@ namespace Models
         #endregion
 
         #region Methods
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="vehicle">Vehicle type</param>
+        /// <param name="vehicleID">Vehicle id</param>
         public void Load(string vehicle, Guid vehicleID)
         {
+            // Get and set vehicle type.
             this.vehicle = vehicle;
+            // Get and set vehicle id.
             this.vehicleID = vehicleID;
+            // Set crane status to loading.
             _CraneState = CraneState.loading;
+            // Set needsUpdate to true.
+            needsUpdate = true;
+        }
+        
+        /// <summary>
+        /// Unload the boxes.
+        /// </summary>
+        public void Unload()
+        {
+            // Set crane status to unloading.
+            _CraneState = CraneState.unloading;
+            // Set needsUpdate to true.
             needsUpdate = true;
         }
 
-        public void Unload()
-        {
-            _CraneState = CraneState.unloading;
-            needsUpdate = true;
-        }
         /// <summary>
         /// Update function for the Crane.
         /// </summary>
