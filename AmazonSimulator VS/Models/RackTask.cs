@@ -16,13 +16,15 @@ namespace Models
         private Node[] path;
         #endregion
 
-        #region Methods
+        #region Constructors
         /// <summary>
         /// Add paths to the rack tasks.
         /// </summary>
         /// <param name="path">The path the rack has to take.</param>
         public RackTask(Node[] path) => this.path = path;
+        #endregion
 
+        #region Methods
         /// <summary>
         /// Start the task for the rack.
         /// </summary>

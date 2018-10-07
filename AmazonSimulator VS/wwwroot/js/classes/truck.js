@@ -1,6 +1,12 @@
+/**
+ ** variables.
+ **/
 var instanceTruck = false;
 var firstLoadTruck = true;
 
+/**
+ ** Robot model class.
+ **/
 class Truck extends THREE.Group {
     constructor(obj = false) {
         super();
@@ -38,6 +44,13 @@ class Truck extends THREE.Group {
             Loading.OBJModel('obj/truck/', 'truck.obj', 'obj/truck/', 'truck.mtl', (mesh) => {
                 mesh.name = "truck";
                 instanceTruck = mesh;
+
+                mesh.traverse(function (child) {
+                    if (child instanceof THREE.Mesh) {
+                        child.castShadow = true;
+                    }
+                });
+
                 selfRef.add(mesh);
                 selfRef._loadState = LoadStates.LOADED; 
 

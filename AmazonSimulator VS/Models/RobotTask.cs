@@ -16,13 +16,15 @@ namespace Models
         private Node[] path;
         #endregion
 
-        #region Methods
+        #region Constructors
         /// <summary>
         /// Add paths to the robot tasks.
         /// </summary>
         /// <param name="path">The path the robot has to take.</param>
         public RobotTask(Node[] path) => this.path = path;
+        #endregion
 
+        #region Methods
         /// <summary>
         /// Start the task for the robot.
         /// </summary>

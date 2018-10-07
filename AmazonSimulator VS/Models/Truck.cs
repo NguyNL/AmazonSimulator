@@ -7,7 +7,7 @@ namespace Models
 {
     public class Truck : Mesh, IUpdatable
     {
-        #region Properties
+        #region Variables
         // Set maximum speed of truck.
         private double MaxSpeed = 0.08;
         // Set current speed of truck.
@@ -18,6 +18,9 @@ namespace Models
         private bool MovingAwayFromCrane = false;
         // Integer for the amount of racks loaded.
         public int NumberOfRacksLoaded = 4;
+        #endregion
+
+        #region Properties
         /// <summary>
         /// Position of truck.
         /// </summary>
@@ -163,9 +166,9 @@ namespace Models
                     // Set MovingAwayFromCrane to false.
                     MovingAwayFromCrane = false;
                     // Check if transport is not done.
-                    if (this.Position != Transport.done)
+                    if (this.Position != Transport.finish)
                         // Set transport to done.
-                        this.Position = Transport.done;
+                        this.Position = Transport.finish;
                 }
                 // Set needsUpdate to true.
                 needsUpdate = true;

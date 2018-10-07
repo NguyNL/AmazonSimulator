@@ -1,6 +1,13 @@
+/**
+ ** variables.
+ **/
 var instanceBox = false;
 var firstLoadBox = true;
 
+
+/**
+ ** Box model class.
+ **/
 class Box extends THREE.Group {
 
     constructor() {

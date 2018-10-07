@@ -2,6 +2,7 @@
     return JSON.parse(input);
 }
 
+// Add Pointlights.
 function addPointLight(object, color, x, y, z, intensity, distance, decay, name = "") {
     var pointLight = new THREE.PointLight(color, intensity, distance);
 
@@ -14,6 +15,7 @@ function addPointLight(object, color, x, y, z, intensity, distance, decay, name 
     object.add(pointLight);
 }
 
+// Add spotlights.
 function addSpotLight(object, color, x, y, z, tx, ty, tz, decay, intensity, distance) {
     var spotLight = new THREE.SpotLight(color, intensity, distance);
 
@@ -27,6 +29,22 @@ function addSpotLight(object, color, x, y, z, tx, ty, tz, decay, intensity, dist
     object.add(spotLight.target);
 }
 
+// Add lensflares.
+function Lensflare(object, texture, color, x, y, z, size) {
+
+    var lensflare = new THREE.Lensflare();
+    lensflare.addElement(
+        new THREE.LensflareElement(
+            texture,
+            size, 0,
+            new THREE.Color(color)
+        )
+    );
+    lensflare.position.set(x, y, z);
+    object.add(lensflare);
+}
+
+// Unload the container from loading deck.
 function unloadLoadingDeck() {
     switch (loadDeckIsLoadedWith) {
         case "boat":
@@ -38,6 +56,7 @@ function unloadLoadingDeck() {
     }
 }
 
+// Log progress in web console.
 function loadProgressUpdate(progress, processesCount, loading = true) {
     if (allProcesses.length === 0) {
         allProcesses.push(progress);
@@ -65,6 +84,7 @@ function loadProgressUpdate(progress, processesCount, loading = true) {
     //);
 }
 
+// Put boat container back on boat.
 function removeTruckContainer(truck) {
     //if (animationInProgress) return;
     //if (!loadDeckIsLoadedWith) return;
@@ -136,6 +156,7 @@ function removeTruckContainer(truck) {
         });
 }
 
+// Get truck container with crane.
 function getTruckContainer(truck) {
     //if (animationInProgress) return;
     //if (loadDeckIsLoadedWith) return unloadLoadingDeck();
@@ -206,6 +227,7 @@ function getTruckContainer(truck) {
     });
 }
 
+// Put boat container back on boat.
 function removeBoatContainer() {
     if (animationInProgress) return;
     if (!loadDeckIsLoadedWith) return;
@@ -282,6 +304,7 @@ function removeBoatContainer() {
 
 }
 
+// Get boat container with crane.
 function getBoatContainer() {
     if (animationInProgress) return;
     if (loadDeckIsLoadedWith) return unloadLoadingDeck();
@@ -293,10 +316,10 @@ function getBoatContainer() {
     var animationTimeX = Math.abs(boat.position.x - boatX) * distanceAnimationRatio;
     var animationTimeZ = Math.abs(boat.position.z - boatZ) * distanceAnimationRatio;
 
-    if (boat.position.x != boatX)
+    if (boat.position.x !== boatX)
         TweenMax.to(boat.position, animationTimeX, { x: boatX });
 
-    if (boat.position.z != boatZ)
+    if (boat.position.z !== boatZ)
         TweenMax.to(boat.position, animationTimeZ, { z: boatZ, });
 
     var AnimationDelay = animationTimeX > animationTimeZ ? animationTimeX : animationTimeZ;

@@ -1,6 +1,13 @@
+/**
+ ** variables.
+ **/
 var instanceRack = false;
 var firstLoadRack = true;
 
+
+/**
+ ** Rack model class.
+ **/
 class Rack extends THREE.Group {
     constructor(obj = false) {
         super();

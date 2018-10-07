@@ -1,11 +1,14 @@
+// Variables.
 var exampleSocket;
 var boxes = [];
+
+// Onload function.
 window.onload = function () {
 
-
+    // Init function.
     function init() {
         /**
-         ** CAMERA & RENDER SETTINGS
+         ** Camera settings.
          **/
         camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1500);
         cameraControls = new THREE.OrbitControls(camera);
@@ -17,23 +20,63 @@ window.onload = function () {
         cameraControls.maxPolarAngle = Math.PI / 2;
         cameraControls.maxZoom = 10;
         cameraControls.update();
+
+        /**
+         ** Scene settings.
+         **/
         scene = new THREE.Scene();
         fogColor = new THREE.Color(0xf1f1f1);
-
         scene.background = fogColor;
         scene.fog = new THREE.Fog(fogColor, 0.015, 300);
 
+        /**
+         ** Light settings.
+         **/
+        var light = new THREE.SpotLight(0xffffff, 0.05);
+        light.position.set(-50, 100, 100);
+        light.castShadow = true;
+        light.shadowCameraVisible = true;
+
+        // Set up shadow properties for the light.
+        light.shadow.mapSize.width = 512;
+        light.shadow.mapSize.height = 512;
+        light.shadow.camera.near = 50;
+        light.shadow.camera.far = 300;
+
+        // add lights to scene.
+        scene.add(light);
+        scene.add(light.target);
+
+        // Ambient light.
+        var AmbientLight = new THREE.AmbientLight(0x404040);
+        light.intensity = 4;
+        scene.add(AmbientLight);
+
+        /**
+         ** Renderer settings.
+         **/
         renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x00000, 1.0);
+        renderer.shadowMapEnabled = true;
         renderer.setSize(window.innerWidth, window.innerHeight + 5);
+
+        // Append render settings to html document.
         document.body.appendChild(renderer.domElement);
 
+        // Three.JS interaction function.
         var interaction = new THREE.Interaction(renderer, scene, camera);
 
+        // Resize handler.
         window.addEventListener('resize', onWindowResize, false);
 
+        // Three.JS handler.
         THREE.Loader.Handlers.add(/\.tga$/i, new THREE.TGALoader());
 
+        // Camera box settings.
         function onPositionChange() {
             if (cameraControls.target.x > 100) {
                 camera.position.x = 100;
@@ -56,64 +99,57 @@ window.onload = function () {
             }
         }
 
+        // Add listener for camera movement.
         cameraControls.addEventListener('change', onPositionChange);
 
         /**
-         ** SKYBOX
+         ** Skybox.
          **/
 
-        // cube
+        // cube.
         var cube = new THREE.CubeGeometry(1000, 1000, 1000);
         var cubeMaterials = [
-            // front side
+            // Front side.
             new THREE.MeshBasicMaterial({
                 map: new THREE.TGALoader().load('textures/skybox/' + textMap + '/' + textName + '_ft.tga'),
                 side: THREE.DoubleSide
             }),
-            // back side
+            // Back side.
             new THREE.MeshBasicMaterial({
                 map: new THREE.TGALoader().load('textures/skybox/' + textMap + '/' + textName + '_bk.tga'),
                 side: THREE.DoubleSide
             }),
-            // Top side
+            // Top side.
             new THREE.MeshBasicMaterial({
                 map: new THREE.TGALoader().load('textures/skybox/' + textMap + '/' + textName + '_up.tga'),
                 side: THREE.DoubleSide
             }),
-            // Bottom side
+            // Bottom side.
             new THREE.MeshBasicMaterial({
                 map: new THREE.TGALoader().load('textures/skybox/' + textMap + '/' + textName + '_dn.tga'),
                 side: THREE.DoubleSide
             }),
-            // right side
+            // Right side.
             new THREE.MeshBasicMaterial({
                 map: new THREE.TGALoader().load('textures/skybox/' + textMap + '/' + textName + '_rt.tga'),
                 side: THREE.DoubleSide
             }),
-            // left side
+            // Left side.
             new THREE.MeshBasicMaterial({
                 map: new THREE.TGALoader().load('textures/skybox/' + textMap + '/' + textName + '_lf.tga'),
                 side: THREE.DoubleSide
             })
         ];
 
-        //add cube & materials
+        // Add cube & materials.
         var cubeMaterial = new THREE.MeshFaceMaterial(cubeMaterials);
         var mesh = new THREE.Mesh(cube, cubeMaterial);
         scene.add(mesh);
 
-        /**
-         ** LIGHT
-         **/
-
-        var light = new THREE.AmbientLight(0x404040);
-        light.intensity = 4;
-        scene.add(light);
-
         THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
 
         /**
-         ** PLATFORM(WORLD) LOADING
+         ** Platform loading.
          **/
         Loading.OBJModel('obj/platform/', 'loading_platform.obj', 'obj/platform/', 'loading_platform.mtl', (mesh) => {
             mesh.scale.set(20, 20, 20);
@@ -143,7 +179,7 @@ window.onload = function () {
         });
 
         /**
-         ** LOADDOCK LOADING
+         ** Load dock loading.
          **/
         Loading.OBJModel('obj/laadruimte/', 'laadruimte.obj', 'obj/laadruimte/', 'laadruimte.mtl', (mesh) => {
             mesh.position.y = 6.2;
@@ -161,7 +197,7 @@ window.onload = function () {
 
 
         /**
-         ** ADD TO SCENE
+         ** Add to scenes.
          **/
         scene.add(warehouse);
         scene.add(platformGroup);
@@ -170,19 +206,21 @@ window.onload = function () {
         scene.add(cranemove);
     }
 
-
+    // Resize function.
     function onWindowResize() {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
+    // Animate function.
     function animate() {
         requestAnimationFrame(animate);
         cameraControls.update();
         renderer.render(scene, camera);
     }
-    
+
+    // Sockets
     exampleSocket = new WebSocket("ws://" + window.location.hostname + ":" + window.location.port + "/connect_client");
     exampleSocket.onmessage = function (event) {
         var command = parseCommand(event.data);

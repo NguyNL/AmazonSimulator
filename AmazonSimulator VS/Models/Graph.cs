@@ -6,13 +6,11 @@ namespace Models
 {
     public class Graph
     {
-        #region Properties
-
+        #region Variables
         // Create dictionary vertices.
         Dictionary<string, Dictionary<string, Node>> vertices = new Dictionary<string, Dictionary<string, Node>>();
         // Create dictionary nodesSmall.
         Dictionary<string, Node> nodesSmall = new Dictionary<string, Node>();
-
         #endregion
 
         #region Methods

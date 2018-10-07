@@ -1,6 +1,12 @@
+/**
+ ** variables.
+ **/
 var instanceRobot = false;
 var firstLoadRobot = true;
 
+/**
+ ** Robot model class.
+ **/
 class Robot extends THREE.Group {
     constructor() {
         super();

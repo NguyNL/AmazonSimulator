@@ -29,9 +29,12 @@ namespace Models {
 
             LoadGridMap();
 
-            //Manager.AllRobots[0].Move(manager.g.shortest_path(Manager.AllRobots[0].Position, "101"), "101");
-            //Manager.AllRobots[1].Move(manager.g.shortest_path(Manager.AllRobots[1].Position, "102"), "102");
-            //Manager.AllRobots[2].Move(manager.g.shortest_path(Manager.AllRobots[2].Position, "102"), "102");
+            Manager.AllRobots[0].Move(manager.g.shortest_path(Manager.AllRobots[0].Position, "101"), "101");
+            Manager.AllRobots[1].Move(manager.g.shortest_path(Manager.AllRobots[1].Position, "102"), "102");
+            Manager.AllRobots[2].Move(manager.g.shortest_path(Manager.AllRobots[2].Position, "102"), "102");
+            Manager.AllRobots[0].Move(manager.g.shortest_path(Manager.AllRobots[0].Position, "07"), "07");
+            Manager.AllRobots[1].Move(manager.g.shortest_path(Manager.AllRobots[1].Position, "07"), "07");
+            Manager.AllRobots[2].Move(manager.g.shortest_path(Manager.AllRobots[2].Position, "07"), "07");
         }
 
         private void LoadGridMap()

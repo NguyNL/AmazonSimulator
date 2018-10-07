@@ -7,7 +7,7 @@ namespace Models
 {
     public class Boat : Mesh, IUpdatable
     {
-        #region Properties
+        #region Variables
         // Set maximum speed of boat.
         private double MaxSpeed = 0.03;
         // Set current speed of boat.
@@ -18,6 +18,9 @@ namespace Models
         private bool MovingAwayFromCrane = false;
         // Integer for the amount of racks loaded.
         public int NumberOfRacksLoaded = 4;
+        #endregion
+
+        #region Properties
         /// <summary>
         /// Position of boat.
         /// </summary>

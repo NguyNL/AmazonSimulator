@@ -7,47 +7,95 @@ namespace Models
 {
     public class Rack : Mesh, IUpdatable
     {
+        #region Variables
+        // Create list of tasks for rack.
         private List<RackTask> Tasks = new List<RackTask>();
+        // Create list of boxes for rack.
         public List<Box> Boxes = new List<Box>();
+        // Set speed.
         private double Speed = 1;
-        public string Position { get; private set; }
-        public string CurrentPos { get; private set; }
+        // Set bool for rotation animation.
         private bool InRotationAnimation = false;
+        // Set bool for first movement.
         private bool FirstMovement = true;
+        #endregion
 
+        #region Properties
+        /// <summary>
+        /// Get and set position.
+        /// </summary>
+        public string Position { get; private set; }
+        /// <summary>
+        /// Get and set current position.
+        /// </summary>
+        public string CurrentPos { get; private set; }
+        #endregion
+
+        #region Constructors
+        /// <summary>
+        /// Rack constructor with custom values.
+        /// </summary>
+        /// <param name="x">Axis-X position</param>
+        /// <param name="y">Axis-Y position</param>
+        /// <param name="z">Axis-Z position</param>
+        /// <param name="rotationX">Rotation axis-X</param>
+        /// <param name="rotationY">Rotation axis-Y</param>
+        /// <param name="rotationZ">Rotation axis-Z</param>
         public Rack(double x, double y, double z, double rotationX, double rotationY, double rotationZ) : base(x, y, z, rotationX, rotationY, rotationZ)
         {
+            // Create new unique id.
             this.guid = Guid.NewGuid();
+            // Set type to rack.
             this.type = "rack";
+            // Set start position.
             this.Position = Manager.StartPoint;
+            // Set current position.
             this.CurrentPos = Manager.StartPoint;
-
+            // Set rotation X.
             this.rotationX = 180 * Math.PI / 180;
-
+            // Fill the rack with boxes.
             FillRack();
         }
 
+        /// <summary>
+        /// Rack constructor without pre-set values.
+        /// </summary>
         public Rack()
         {
+            // Create new unique id.
             this.guid = Guid.NewGuid();
+            // Set type to rack.
             this.type = "rack";
+            // Set position.
             this.Position = Manager.StartPoint;
+            // Set current position.
             this.CurrentPos = Manager.StartPoint;
 
+            // Set axis-X position.
             this.x = Manager.StartPointNode.x;
+            // Set axis-Y position.
             this.y = Manager.StartPointNode.y;
+            // Set axis-Z position.
             this.z = Manager.StartPointNode.z;
 
+            // Set rotation axis-X.
             this.rotationX = 180 * Math.PI / 180;
+            // Set rotation axis-Y.
             this.rotationY = 90 * Math.PI / 180;
+            // Set rotation axis-Z.
             this.rotationZ = 0;
 
+            // Fill the rack with boxes.
             FillRack();
         }
+        #endregion
 
+        #region Methods
+        /// <summary>
+        /// Fill the rack with boxes.
+        /// </summary>
         private void FillRack()
         {
-            // RACKS & BOXES
             // Rack Floors Y positions  floor:[1,2,3,4]
             double[] floorY = { -0.86, -0.3035, 0.2552, 0.8058 };
 
@@ -62,7 +110,8 @@ namespace Models
                 {0.01, 0.015, 0.01},
                 {0.013, 0.01, 0.013}
             };
-
+            
+            // Create randomizer.
             Random rnd = new Random();
 
             // Fill floors on a rack
@@ -74,52 +123,59 @@ namespace Models
                 // Max 9 Cardboard boxes
                 for (var j = 0; j < 9; j++)
                 {
+                    // Box index is random.
                     int boxIndex = rnd.Next(0,3);
 
+                    // Check if box index is 2.
                     if (boxIndex == 2)
                     {
+                        // Set X coordinates.
                         cordX[2] += 0.04;
                         cordZ[2] -= 0.02;
                     }
 
+                    // Check if coordinate X of box 2 is higher than coordinate X of box 1.
                     if (cordX[2] > cordX[1])
                     {
+                        // Check if coordinate Z of box 2 - box size is lower than coordinates Z box 1.
                         if ((cordZ[2] - boxSizes[boxIndex]) < cordZ[1]) break;
-
+                        
+                        // Set Z coordinates.
                         cordZ[2] -= boxSizes[boxIndex];
                         cordX[2] = cordX[0];
 
+                        // Check if box index is 2.
                         if (boxIndex == 2)
                         {
+                            // Set Z coordinates.
                             cordX[2] += 0.04;
                             cordZ[2] -= 0.02;
                         }
                     }
 
+                    // Create new box.
                     var newBox = new Box(cordX[2], floorY[i], cordZ[2], rnd.Next(0, 50) / 1000, 0, 0, boxSizeScale[boxIndex,0], boxSizeScale[boxIndex, 1], boxSizeScale[boxIndex, 2], this.guid);
-                    
-                    //newBox.position.y = floorY[i];
-                    //newBox.position.x = cordX[2];
-                    //newBox.position.z = cordZ[2];
 
-                    //newBox.rotation.y = Math.round(Math.random() * 50) / 1000;
-
-                    //newBox.scale.set(boxSizes[boxIndex][1][0], boxSizes[boxIndex][1][1], boxSizes[boxIndex][1][2]);
-
+                    // Set X coordinates.
                     cordX[2] += boxSizes[boxIndex];
 
+                    // Check if index of box is 2.
                     if (boxIndex == 2)
                     {
+                        // Set Z coordinates.
                         cordZ[2] -= 0.06;
                     }
 
+                    // Add boxes to list.
                     Boxes.Add(newBox);
-                    //rack.add(newobject);
-                    //boxes.push(newobject);
                 }
             }
         }
 
+        /// <summary>
+        /// Move rack over path.
+        /// </summary>
+        /// <param name="path">All the paths</param>
         public void MoveOverPath(Node[] path)
         {
             if (FirstMovement)
@@ -263,5 +319,6 @@ namespace Models
 
             return false;
         }
-}
+        #endregion
+    }
 }
