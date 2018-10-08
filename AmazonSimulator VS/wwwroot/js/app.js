@@ -154,6 +154,15 @@ window.onload = function () {
             mesh.position.z = 0;
             mesh.position.x = 0;
 
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+            mesh.traverse(function (child) {
+                if (child instanceof THREE.Mesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+
             cranemove.add(mesh.getObjectByName("CraneMoveBlock_1_mesh1169467915"));
             cranemove.add(mesh.getObjectByName("CraneMoveBlock_2_mesh1697543657"));
             cranemove.add(mesh.getObjectByName("CraneMoveBlock_3_mesh1358320812"));
@@ -171,6 +180,12 @@ window.onload = function () {
             mesh.position.z = 0;
             mesh.position.x = 0;
 
+            mesh.traverse(function (child) {
+                if (child instanceof THREE.Mesh) {
+                    child.castShadow = true;
+                }
+            });
+
             platformGroup.add(mesh);
         });
 
@@ -181,6 +196,12 @@ window.onload = function () {
             mesh.position.y = 6.2;
             mesh.position.z = 22.7;
             mesh.position.x = 3.23;
+
+            mesh.traverse(function (child) {
+                if (child instanceof THREE.Mesh) {
+                    child.castShadow = true;
+                }
+            });
 
             mesh.rotation.y = 1.57;
             mesh.scale.set(10, 10, 10);
