@@ -44,18 +44,6 @@ function Lensflare(object, texture, color, x, y, z, size) {
     object.add(lensflare);
 }
 
-// Unload the container from loading deck.
-function unloadLoadingDeck() {
-    switch (loadDeckIsLoadedWith) {
-        case "boat":
-            removeBoatContainer();
-            break;
-        case "truck":
-            removeTruckContainer();
-            break;
-    }
-}
-
 // Log progress in web console.
 function loadProgressUpdate(progress, processesCount, loading = true) {
     if (allProcesses.length === 0) {
@@ -86,8 +74,6 @@ function loadProgressUpdate(progress, processesCount, loading = true) {
 
 // Put truck container back on truck.
 function removeTruckContainer(truck) {
-    //if (animationInProgress) return;
-    //if (!loadDeckIsLoadedWith) return;
     animationInProgress = true;
 
     var container = truck.getObjectByName("truck");
@@ -154,14 +140,9 @@ function removeTruckContainer(truck) {
 
 // Get truck container with crane.
 function getTruckContainer(truck) {
-    //if (animationInProgress) return;
-    //if (loadDeckIsLoadedWith) return unloadLoadingDeck();
-
     animationInProgress = true;
     loadDeckIsLoadedWith = "truck";
 
-    var distanceAnimationRatio = 0.1;
-    var tick = 1; var klok = setInterval(function () { console.log(tick++); }, 1000);
     TweenMax.to(cranemove.position, 2, {
         x: truckX,
         onUpdate: function () { loadProgressUpdate((isNaN(this.progress()) ? 1 : this.progress()), 6); },
@@ -206,7 +187,6 @@ function getTruckContainer(truck) {
                                                                     z: 0.2,
                                                                     onUpdate: function () { loadProgressUpdate(this.progress(), 6); },
                                                                     onComplete: function () {
-                                                                        clearInterval(klok);
                                                                         animationInProgress = false;
                                                                         allProcesses = [];
                                                                         allProcessesIndex = 0;
@@ -226,9 +206,6 @@ function getTruckContainer(truck) {
 
 // Put boat container back on boat.
 function removeBoatContainer(boat) {
-    //if (animationInProgress) return;
-    //if (!loadDeckIsLoadedWith) return;
-
     var container = boat.getObjectByName("boatContainer");
 
     animationInProgress = true;
@@ -305,9 +282,6 @@ function removeBoatContainer(boat) {
 
 // Get boat container with crane.
 function getBoatContainer(boat) {
-    //if (animationInProgress) return;
-    //if (loadDeckIsLoadedWith) return unloadLoadingDeck();
-
     animationInProgress = true;
     loadDeckIsLoadedWith = "boat";
 

@@ -168,12 +168,28 @@ namespace Models
         }
 
         /// <summary>
+        /// Delete rack.
+        /// </summary>
+        public void Delete()
+        {
+            // Set rack action to delete.
+            this.action = "delete";
+        }
+
+        /// <summary>
         /// Update function for the boat.
         /// </summary>
         /// <param name="tick">Tick speed</param>
         /// <returns>True or False.</returns>
         public override bool Update(int tick)
         {
+            // Check if rack action is deleting.
+            if (this.action == "delete")
+            {
+                // Return true.
+                return true;
+            }
+
             // Check if needsUpdate is true.
             if (needsUpdate)
             {

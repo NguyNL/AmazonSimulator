@@ -16,8 +16,6 @@ boatGroup.position.y = 0;
 boatGroup.position.x = 2.15;
 boatGroup.position.z = -2.9;
 
-//var boatContainer = new THREE.Group();
-
 // CraneMove
 var cranemove = new THREE.Group();
 cranemove.scale.set(20, 20, 20);

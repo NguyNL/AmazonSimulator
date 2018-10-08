@@ -233,7 +233,7 @@ namespace Models
             if (RobotListNextStep.Count > 0)
             {
                 // Check if robot is not at waiting position
-                if (CurrentRow != 4)
+                if (CurrentRow != 4 && (CurrentColumn != 3 || CurrentColumn != 5 || CurrentColumn != 4) && (NextRow != 4))
                 {
                     // Set robot allowed to move to false.
                     AllowedToMove = false;
@@ -326,8 +326,14 @@ namespace Models
             {
                 // Get rack.
                 Rack rack = data.First();
-                // Move rack.
-                rack.MoveOverPath(this.x, this.z, this.rotationY);
+                if(CurrentPos != "07" || path.Length > 1)
+                    // Move rack.
+                    rack.MoveOverPath(this.x, this.z, this.rotationY);
+                else
+                {
+                    Manager.AllRacks.RemoveAt(Manager.AllRacks.IndexOf(rack));
+                    rack.Delete();
+                }
             }
         }
 

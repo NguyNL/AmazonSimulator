@@ -73,8 +73,6 @@ namespace Models
         {
             // Set crane status to free.
             _CraneState = CraneState.free;
-            // Set needsUpdate to true.
-            needsUpdate = true;
         }
 
         /// <summary>

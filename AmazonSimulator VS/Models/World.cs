@@ -11,103 +11,132 @@ namespace Models
 {
     public class World : IObservable<Command>, IUpdatable
     {
+        #region Variables
+        // List of meshes in the world.
         static private List<Mesh> worldObjects = new List<Mesh>();
+        // List of observers.
         private List<IObserver<Command>> observers = new List<IObserver<Command>>();
-
+        // Calling the manager class.
         private static Manager manager;
+        #endregion
 
+        #region Constructors
+        /// <summary>
+        /// World constructor.
+        /// </summary>
         public World()
         {
+            // Create new manager.
             manager = new Manager(
+                // Create truck.
                 CreateTruck(),
+                // Create boat.
                 CreateBoat(),
+                // Create crane.
                 CreateCrane()
             );
 
+            // Create 4 robots.
             for (int i = 0; i < 4; i++)
                 CreateRobot();
 
+            // Create doors.
             Manager.Doors = CreateDoors();
 
+            // Load grid map.
             LoadGridMap();
 
+            // Set robots to wait position.
             RobotsToWaitPosition();
-
-            //Manager.AllRobots[0].Move(manager.g.shortest_path(Manager.AllRobots[0].Position, "101"), "101");
-            //Manager.AllRobots[1].Move(manager.g.shortest_path(Manager.AllRobots[1].Position, "102"), "102");
-            //Manager.AllRobots[2].Move(manager.g.shortest_path(Manager.AllRobots[2].Position, "102"), "102");
-
-
-            //Manager.AllRobots[0].Move(manager.g.shortest_path(Manager.AllRobots[0].Position, "07"), "07");
-            ////Manager.AllRobots[1].Move(manager.g.shortest_path(Manager.AllRobots[1].Position, "07"), "07");
-            //Manager.AllRobots[2].Move(manager.g.shortest_path(Manager.AllRobots[2].Position, "07"), "07");
         }
+        #endregion
 
+        #region Methods
+        /// <summary>
+        /// Move robots to waiting positions.
+        /// </summary>
         private void RobotsToWaitPosition()
         {
+            // Get list of waiting places.
             var WaitingPlaces = manager.RobotWaitPlaces
                .Where(x => x.Value.HasMeshOnIt == false).ToList();
 
             for (int i = 0; i < Manager.AllRobots.Count(); i++)
             {
+                // Set place index.
                 int placeIndex = i;
                 if ((i + 1) > (WaitingPlaces.Count() / 2))
                 {
+                    // Set place index.
                     placeIndex = (WaitingPlaces.Count - i) + (WaitingPlaces.Count() / 2) - 1;
                 }
-
+                // Move robot to waiting place.
                 Manager.AllRobots[i].Move(manager.g.shortest_path(Manager.AllRobots[i].Position, WaitingPlaces[placeIndex].Value.Coord), WaitingPlaces[placeIndex].Value.Coord);
+                // Set waiting place to taken.
                 WaitingPlaces[placeIndex].Value.HasMeshOnIt = true;
+                // Set unique id on the waiting place.
                 WaitingPlaces[placeIndex].Value.guid = Manager.AllRobots[i].guid;
             }
 
         }
 
+        /// <summary>
+        /// Create a grid for the racks and paths.
+        /// </summary>
         private void LoadGridMap()
         {
+            // Set X for each step.
             int stepX = 25;
+            // Set Z for each step.
             int stepZ = 25;
 
+            // Set amount of rows.
             int rows = 11;
+            // Set amount of columns.
             int columns = 9;
 
+            // Set amount of breaks after loading deck.
             int breaksAfterLoadDeck = 5;
 
+            // Set rack place index.
             int rackPlaceIndex = 0;
+            // Set robot place index.
             int robotPlaceIndex = 0;
 
             for (int row = 0; row < rows; row++)
             {
-                // Dont start adding before break is done
+                // Don't start adding before break is done.
                 if (row != 0 && row < (breaksAfterLoadDeck - 1)) continue;
 
                 for (int column = 0; column < columns; column++)
                 {
+                    // Get center.
                     int center = (int)Math.Floor((decimal)(columns / 2));
 
-                    // current key
+                    // Current key.
                     string key = row.ToString() + column.ToString();
 
-                    // keep track of it need a point
+                    // Keep track of it need a point.
                     bool needsPoint = false;
 
-                    // tempory path points where you can go to from this point
+                    // Temporary path points where you can go to from this point.
                     Dictionary<string, Node> vertexDictonary = new Dictionary<string, Node>();
 
-                    // Add the position to the map
+                    // Add the position to the map.
                     manager.Map.Add(key, new Node
                     {
                         x = column * stepX,
                         y = 0,
                         z = row * stepZ
                     });
-
+                    // Add robot waiting position.
                     if (row == (breaksAfterLoadDeck - 1))
                     {
+                        // Check if the column isn't at center.
                         if (center != column && (column < center - 1 || column > center + 1))
                         {
 
-                            // Add new robot waiting position
+                            // Add new robot waiting position,
                             manager.RobotWaitPlaces.Add(
                                 robotPlaceIndex,
                                 new PlaceInfo
@@ -118,6 +147,7 @@ namespace Models
 
                             robotPlaceIndex++;
 
+                            // Add coordinates into the vertex dictionary.
                             vertexDictonary.Add(row.ToString() + center.ToString(), new Node
                             {
                                 x = center * stepX,
@@ -125,14 +155,17 @@ namespace Models
                                 z = row * stepZ
                             });
 
+                            // Set needs point.
                             needsPoint = true;
                         }
 
+                        // Check if center is column.
                         if (center == column)
                         {
-                            // Add all paths on both sides of the middle point
+                            // Add all paths on both sides of the middle point.
                             for (int i = 0; i < columns; i++)
                                 if (i != column && (i < center - 1 || i > center + 1))
+                                    // Add coordinates to vertex dictionary.
                                     vertexDictonary.Add(row.ToString() + i.ToString(), new Node
                                     {
                                         x = i * stepX,
@@ -140,7 +173,7 @@ namespace Models
                                         z = row * stepZ
                                     });
 
-                            // Add behind doors point
+                            // Add behind doors point.
                             vertexDictonary.Add("04", new Node
                             {
                                 x = 4 * stepX,
@@ -148,19 +181,30 @@ namespace Models
                                 z = 0
                             });
 
+                            // Add all the paths down path
+                            for (int i = breaksAfterLoadDeck; i < rows; i = i + 2)
+                                vertexDictonary.Add(i.ToString() + column.ToString(), new Node
+                                {
+                                    x = column * stepX,
+                                    y = 0,
+                                    z = i * stepZ
+                                });
+
+                            // Set needs point.
                             needsPoint = true;
                         }
                     }
                     else
                     {
-                        // Middle point
+                        // Middle point.
                         if (Math.Floor((decimal)(columns / 2)) == column)
                         {
-                            // Load deck path
+                            // Load deck path.
                             if (row == 0)
                             {
-                                // Add all the paths down path
+                                // Add all the paths down path.
                                 for (int i = breaksAfterLoadDeck; i < rows; i = i + 2)
+                                    // Add coordinates to vertex dictionary.
                                     vertexDictonary.Add(i.ToString() + column.ToString(), new Node
                                     {
                                         x = column * stepX,
@@ -168,10 +212,10 @@ namespace Models
                                         z = i * stepZ
                                     });
 
-                                // Add begin point
+                                // Add begin point.
                                 vertexDictonary.Add(Manager.StartPoint, Manager.StartPointNode);
 
-                                // Add Waiting Places robots
+                                // Add Waiting Places robots.
                                 vertexDictonary.Add((breaksAfterLoadDeck - 1).ToString() + column.ToString(), new Node
                                 {
                                     x = column * stepX,
@@ -179,48 +223,54 @@ namespace Models
                                     z = (breaksAfterLoadDeck - 1) * stepZ
                                 });
 
+                                // Set needs point.
                                 needsPoint = true;
                             }
                             else
-                                if (row % 2 == breaksAfterLoadDeck % 2)
                             {
-                                // Add behind doors point
-                                vertexDictonary.Add("04", new Node
+                                if (row % 2 == breaksAfterLoadDeck % 2)
                                 {
-                                    x = 4 * stepX,
-                                    y = 0,
-                                    z = 0
-                                });
+                                    // Add behind doors point.
+                                    vertexDictonary.Add("04", new Node
+                                    {
+                                        x = 4 * stepX,
+                                        y = 0,
+                                        z = 0
+                                    });
 
-                                // Add Waiting Places robots
-                                vertexDictonary.Add((breaksAfterLoadDeck - 1).ToString() + column.ToString(), new Node
-                                {
-                                    x = column * stepX,
-                                    y = 0,
-                                    z = (breaksAfterLoadDeck - 1) * stepZ
-                                });
+                                    // Add Waiting Places robots.
+                                    vertexDictonary.Add((breaksAfterLoadDeck - 1).ToString() + column.ToString(), new Node
+                                    {
+                                        x = column * stepX,
+                                        y = 0,
+                                        z = (breaksAfterLoadDeck - 1) * stepZ
+                                    });
 
-                                // Add all paths on both sides of the middle point
-                                for (int i = 0; i < columns; i++)
-                                    if (i != column)
-                                        vertexDictonary.Add(row.ToString() + i.ToString(), new Node
-                                        {
-                                            x = i * stepX,
-                                            y = 0,
-                                            z = row * stepZ
-                                        });
+                                    // Add all paths on both sides of the middle point.
+                                    for (int i = 0; i < columns; i++)
+                                        if (i != column)
+                                            // Add coordinates to vertex dictionary.
+                                            vertexDictonary.Add(row.ToString() + i.ToString(), new Node
+                                            {
+                                                x = i * stepX,
+                                                y = 0,
+                                                z = row * stepZ
+                                            });
 
-                                // Add all paths from bottom - top middle point
-                                for (int i = breaksAfterLoadDeck; i < rows; i = i + 2)
-                                    if (i != row)
-                                        vertexDictonary.Add(i.ToString() + column.ToString(), new Node
-                                        {
-                                            x = column * stepX,
-                                            y = 0,
-                                            z = i * stepZ
-                                        });
+                                    // Add all paths from bottom - top middle point.
+                                    for (int i = breaksAfterLoadDeck; i < rows; i = i + 2)
+                                        if (i != row)
+                                            // Add coordinates to vertex dictionary.
+                                            vertexDictonary.Add(i.ToString() + column.ToString(), new Node
+                                            {
+                                                x = column * stepX,
+                                                y = 0,
+                                                z = i * stepZ
+                                            });
 
-                                needsPoint = true;
+                                    // Set needs point.
+                                    needsPoint = true;
+                                }
                             }
                             // Not a middle point
                         }
@@ -237,6 +287,7 @@ namespace Models
                                     z = 0
                                 });
 
+                                // Set needs point.
                                 needsPoint = true;
                             }
 
@@ -266,10 +317,9 @@ namespace Models
                                     // rack index up
                                     rackPlaceIndex++;
 
+                                    // Set needs point.
                                     needsPoint = true;
                                 }
-
-
                             }// Normal row
                             else if (row != 0 && row % 2 == breaksAfterLoadDeck % 2)
                             {
@@ -279,6 +329,7 @@ namespace Models
                                     // get all the corners under it
                                     for (int i = breaksAfterLoadDeck; i < rows; i = i + 2)
                                         if (i != row)
+                                            // Add coordinates to vertex dictionary.
                                             vertexDictonary.Add(i.ToString() + column.ToString(), new Node
                                             {
                                                 x = column * stepX,
@@ -289,6 +340,7 @@ namespace Models
                                     // Get all the points on same row
                                     for (int i = 0; i < columns; i++)
                                         if (i != column)
+                                            // Add coordinates to vertex dictionary.
                                             vertexDictonary.Add(row.ToString() + i.ToString(), new Node
                                             {
                                                 x = i * stepX,
@@ -296,12 +348,12 @@ namespace Models
                                                 z = row * stepZ
                                             });
                                 }
-                                // Get the points between corners and middle
-                                else
+                                else // Get the points between corners and middle
                                 {
                                     // Get all the points on same row
                                     for (int i = 0; i < columns; i++)
                                         if (i != column)
+                                            // Add coordinates to vertex dictionary.
                                             vertexDictonary.Add(row.ToString() + i.ToString(), new Node
                                             {
                                                 x = i * stepX,
@@ -318,7 +370,7 @@ namespace Models
                                             z = (row + 1) * stepZ
                                         });
                                 }
-
+                                // Set needs point.
                                 needsPoint = true;
                             }
                         }
@@ -328,109 +380,173 @@ namespace Models
                         manager.g.add_vertex(key, vertexDictonary);
                 }
             }
-            //Thread t = new Thread(new ThreadStart(startFilling));
-            //t.Start();
         }
 
-        //public void startFilling()
-        //{
-        //    foreach (KeyValuePair<int, RackPlace> coord in manager.RackPlaces)
-        //    {
-        //        Robot r = CreateRobot();
-        //        Rack ra = CreateRack();
-
-        //        worldObjects.Add(r);
-        //        worldObjects.Add(ra);
-
-        //        r.Move(g.shortest_path(r.Position, coord.Value.Coord), coord.Value.Coord);
-        //        ra.Move(g.shortest_path(ra.Position, coord.Value.Coord), coord.Value.Coord);
-
-        //        if (coord.Key == 2)
-        //            break;
-
-        //        Thread.Sleep(10000);
-        //    }
-
-        //    manager.AllRobots[0].Move(g.shortest_path(manager.AllRobots[0].Position, "07"), "07");
-        //    manager.AllRacks[0].Move(g.shortest_path(manager.AllRacks[0].Position, "07"), "07");
-
-        //    manager.AllRobots[1].Delete();
-        //}
-
+        /// <summary>
+        /// Create a robot with custom position values.
+        /// </summary>
+        /// <param name="x">Axis-X</param>
+        /// <param name="y">Axis-Y</param>
+        /// <param name="z">Axis-Z</param>
+        /// <returns>Object robot</returns>
         private Robot CreateRobot(double x, double y, double z)
         {
+            // Create new robot object.
             Robot robot = new Robot(x, y, z, 0, 0, 0);
+            // Add robot to the world.
             worldObjects.Add(robot);
+            // Add robot to the robots list.
             Manager.AllRobots.Add(robot);
+            // Return robot object.
             return robot;
         }
 
+        /// <summary>
+        /// Create a robot.
+        /// </summary>
+        /// <returns>Object robot</returns>
         private Robot CreateRobot()
         {
+            // Create new robot object.
             Robot robot = new Robot();
+            // Add robot to the world.
             worldObjects.Add(robot);
+            // Add robot to the robots list.
             Manager.AllRobots.Add(robot);
+            // Return robot object.
             return robot;
         }
 
+        /// <summary>
+        /// Create a rack with custom position values.
+        /// </summary>
+        /// <param name="x">Axis-X</param>
+        /// <param name="y">Axis-Y</param>
+        /// <param name="z">Axis-Z</param>
+        /// <returns>Object rack</returns>
         private Rack CreateRack(double x, double y, double z)
         {
+            // Create new rack object.
             Rack rack = new Rack(x, y, z, 0, 0, 0);
+            // Add rack to the world.
             worldObjects.Add(rack);
+            // Add rack to the robots list.
             Manager.AllRacks.Add(rack);
+            // Return rack object.
             return rack;
         }
 
+        /// <summary>
+        /// Create a rack.
+        /// </summary>
+        /// <returns>Object rack</returns>
         public static Rack CreateRack()
         {
+            // Create new rack object.
             Rack rack = new Rack();
+            // Add rack to the world.
             worldObjects.Add(rack);
+            // Add rack to the robots list.
             Manager.AllRacks.Add(rack);
+            // Return rack object.
             return rack;
         }
 
+        /// <summary>
+        /// Create a truck with custom position values.
+        /// </summary>
+        /// <param name="x">Axis-X</param>
+        /// <param name="y">Axis-Y</param>
+        /// <param name="z">Axis-Z</param>
+        /// <returns>Object truck</returns>
         private Truck CreateTruck(double x, double y, double z)
         {
+            // Create new truck object.
             Truck truck = new Truck(x, y, z, 0, 0, 0);
+            // Add truck to the world.
             worldObjects.Add(truck);
+            // Return truck object.
             return truck;
         }
 
+        /// <summary>
+        /// Create a truck.
+        /// </summary>
+        /// <returns>Object truck</returns>
         private Truck CreateTruck()
         {
+            // Create new truck object.
             Truck truck = new Truck();
+            // Add truck to the world.
             worldObjects.Add(truck);
+            // Return truck object.
             return truck;
         }
 
+        /// <summary>
+        /// Create a boat with custom position values.
+        /// </summary>
+        /// <param name="x">Axis-X</param>
+        /// <param name="y">Axis-Y</param>
+        /// <param name="z">Axis-Z</param>
+        /// <returns>Object boat</returns>
         private Boat CreateBoat(double x, double y, double z)
         {
+            // Create new boat object.
             Boat boat = new Boat(x, y, z, 0, 0, 0);
+            // Add boat to the world.
             worldObjects.Add(boat);
+            // Return boat object.
             return boat;
         }
 
+        /// <summary>
+        /// Create a boat.
+        /// </summary>
+        /// <returns>Object boat</returns>
         private Boat CreateBoat()
         {
+            // Create new boat object.
             Boat boat = new Boat();
+            // Add boat to the world.
             worldObjects.Add(boat);
+            // Return boat object.
             return boat;
         }
 
+        /// <summary>
+        /// Create a crane.
+        /// </summary>
+        /// <returns>Object crane</returns>
         private Crane CreateCrane()
         {
+            // Create new crane object.
             Crane crane = new Crane();
+            // Add crane to the world.
             worldObjects.Add(crane);
+            // Return crane object.
             return crane;
         }
 
+        /// <summary>
+        /// Create a door.
+        /// </summary>
+        /// <returns>Object door</returns>
         private LoadDeckDoors CreateDoors()
         {
+            // Create new door object.
             LoadDeckDoors doors = new LoadDeckDoors();
+            // Add door to the world.
             worldObjects.Add(doors);
+            // Return door object.
             return doors;
         }
 
+        /// <summary>
+        /// Server.
+        /// </summary>
+        /// <param name="observer">Observer</param>
+        /// <returns>Unsubscriber class</returns>
         public IDisposable Subscribe(IObserver<Command> observer)
         {
             if (!observers.Contains(observer))
@@ -442,6 +558,10 @@ namespace Models
             return new Unsubscriber<Command>(observers, observer);
         }
 
+        /// <summary>
+        /// Send command to server.
+        /// </summary>
+        /// <param name="c">Command</param>
         private void SendCommandToObservers(Command c)
         {
             for (int i = 0; i < this.observers.Count; i++)
@@ -450,6 +570,10 @@ namespace Models
             }
         }
 
+        /// <summary>
+        /// Send creation command to server.
+        /// </summary>
+        /// <param name="obs">Iobserver command</param>
         private void SendCreationCommandsToObserver(IObserver<Command> obs)
         {
             foreach (Mesh m3d in worldObjects)
@@ -461,6 +585,11 @@ namespace Models
             }
         }
 
+        /// <summary>
+        /// Update function.
+        /// </summary>
+        /// <param name="tick">Tick timer</param>
+        /// <returns>True or false.</returns>
         public bool Update(int tick)
         {
             //Force garbage collection.
@@ -491,6 +620,7 @@ namespace Models
 
             return true;
         }
+        #endregion
     }
 
     internal class Unsubscriber<Command> : IDisposable

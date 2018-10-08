@@ -17,7 +17,7 @@ namespace Models
         // Boolean to see if truck is moving away from the crane.
         private bool MovingAwayFromCrane = false;
         // Integer for the amount of racks loaded.
-        public int NumberOfRacksLoaded = 4;
+        public int NumberOfRacksLoaded = 3;
         /// <summary>
         /// Position of truck.
         /// </summary>

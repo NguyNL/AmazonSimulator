@@ -73,12 +73,14 @@ class Boat extends THREE.Group {
                 container.scale.set(1, 1, 1);
 
                 instanceBoat = mesh;
-                // Get OBJ child.
+
+                // Loop through all child OBJ.
                 mesh.traverse(function (child) {
                     if (child instanceof THREE.Mesh) {
                         child.castShadow = true;
                     }
                 });
+
                 // Right front head point light.
                 addPointLight(selfRef, 0xffffff, -1.0262989 /*x*/, 0.238311 /*y*/, -1.47609 /*z*/, 10 /*intensity*/, 0.5 /*distance*/, 0.3 /*decay*/);
 

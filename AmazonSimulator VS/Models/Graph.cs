@@ -14,7 +14,6 @@ namespace Models
         #endregion
 
         #region Methods
-
         /// <summary>
         /// Adding a vertex.
         /// </summary>
@@ -97,7 +96,6 @@ namespace Models
             path.Reverse();
             return path.ToArray();
         }
-
         #endregion
     }
 }

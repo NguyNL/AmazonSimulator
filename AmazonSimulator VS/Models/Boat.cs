@@ -12,12 +12,13 @@ namespace Models
         private double MaxSpeed = 0.03;
         // Set current speed of boat.
         private double CurrentSpeed = 0.03;
+        // Integer for the amount of racks loaded.
+        public int NumberOfRacksLoaded = 3;
         // Boolean to see if boat is moving to crane.
         private bool MovingToCrane = false;
         // Boolean to see if boat is moving away from the crane.
         private bool MovingAwayFromCrane = false;
-        // Integer for the amount of racks loaded.
-        public int NumberOfRacksLoaded = 4;
+
         #endregion
 
         #region Properties
@@ -39,12 +40,12 @@ namespace Models
         /// <param name="rotationZ">Rotation Z-axis</param>
         public Boat(double x, double y, double z, double rotationX, double rotationY, double rotationZ) : base(x, y, z, rotationX, rotationY, rotationZ)
         {
+            // Create unique id for the boat.
+            this.guid = Guid.NewGuid();
             // Set type to boat.
             this.type = "boat";
             // Set position.
             this.Position = Transport.created;
-            // Create unique id for the boat.
-            this.guid = Guid.NewGuid();
         }
 
         /// <summary>

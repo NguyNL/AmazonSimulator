@@ -222,7 +222,6 @@ window.onload = function () {
         var command = parseCommand(event.data);
         
         if (command.command === "delete") {
-            console.log("delete");
             if (!(Object.keys(worldObjects).indexOf(command.parameters.guid) < 0)) {
                 var object = worldObjects[command.parameters.guid];
                 
@@ -230,6 +229,10 @@ window.onload = function () {
                     case "robot":
                         // Remove robot object.
                         robotsGroup.remove(object);
+                        break;
+                    case "rack":
+                        // Remove rack object.
+                        racksGroup.remove(object);
                         break;
                 }
 
@@ -304,14 +307,17 @@ window.onload = function () {
                 var truck;
 
                 if (Object.keys(worldObjects).indexOf(command.parameters.guid) < 0) {
+                    // Create new truck
                     truck = new Truck();
 
                     worldObjects[command.parameters.guid] = truck;
+                    // Add truck to group.
                     truckGroup.add(truck);
                 } else {
                     truck = worldObjects[command.parameters.guid];
                 }
-                
+
+                // Truck back lights.
                 if (truck.position.z < 2 && truck.position.z >= 0.0005)
                     truck.breakLights();
                 else
